@@ -36,18 +36,21 @@
         }
         .global-reset:hover { border-color: var(--accent-color); color: var(--accent-color); transform: rotate(-90deg); }
 
-        h1 { 
-            font-family: var(--font-header);
-            margin-bottom: 5px; color: var(--gold); 
-            letter-spacing: 3px; font-size: 1.8rem; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+        h1 { font-family: var(--font-header); margin-bottom: 5px; color: var(--gold); letter-spacing: 3px; font-size: 1.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .subtitle { font-family: var(--font-header); color: var(--text-muted); font-size: 0.7rem; margin-bottom: 15px; letter-spacing: 1px; }
+
+        /* Mod Pack Buttons */
+        .mod-pack-container { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+        .mod-pack-btn { 
+            background: #25252a; border: 1px solid #444; color: var(--text-muted); 
+            padding: 8px 12px; font-family: var(--font-header); font-size: 0.65rem; 
+            cursor: pointer; border-radius: 4px; transition: 0.3s;
+        }
+        .mod-pack-btn:hover { border-color: var(--gold); color: var(--gold); background: #2a2a32; }
 
         .step-selector {
             display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;
             background: #25252a; padding: 12px; border-radius: 4px; border: 1px solid var(--gold);
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
         .step-toggle { font-family: var(--font-header); font-size: 0.75rem; display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--gold); }
         .step-toggle input { accent-color: var(--gold); }
@@ -55,59 +58,34 @@
         .wheel-wrapper {
             position: relative; width: 320px; height: 320px;
             margin: 20px auto; border: 4px solid var(--gold);
-            border-radius: 50%; box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(195, 163, 74, 0.2); 
-            background: #1a1a1e;
+            border-radius: 50%; box-shadow: 0 0 40px rgba(0,0,0,0.9); background: #1a1a1e;
         }
 
         .pointer {
             position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 15px solid transparent;
-            border-right: 15px solid transparent; border-top: 30px solid var(--gold); z-index: 100;
-            filter: drop-shadow(0 2px 5px black);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--gold); z-index: 100;
         }
 
         canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
 
         .card { background-color: var(--card-color); border: 1px solid #3e3e42; border-radius: 4px; padding: 15px; margin-bottom: 12px; text-align: left; }
-        .card h3 { 
-            font-family: var(--font-header);
-            margin-top: 0; font-size: 0.8rem; color: var(--gold); 
-            border-bottom: 1px solid #444; padding-bottom: 6px; margin-bottom: 10px; 
-        }
+        .card h3 { font-family: var(--font-header); margin-top: 0; font-size: 0.8rem; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 6px; margin-bottom: 10px; }
         .card.disabled { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
 
         .add-custom { display: flex; gap: 8px; width: 100%; margin-top: 12px; }
-        .add-custom input { 
-            flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; 
-            padding: 6px 10px; border-radius: 2px; font-family: var(--font-body);
-        }
-        .add-custom button { 
-            background: var(--gold); border: none; color: black; font-weight: bold; 
-            padding: 0 15px; border-radius: 2px; cursor: pointer; font-family: var(--font-header);
-        }
+        .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 6px 10px; font-family: var(--font-body); }
+        .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 15px; cursor: pointer; font-family: var(--font-header); }
 
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
-        .checkbox-label { font-size: 0.9rem; background: #2a2a2f; padding: 6px; border-radius: 2px; border: 1px solid #333; cursor: pointer; }
-        .checkbox-label:hover { border-color: var(--gold); }
+        .checkbox-label { font-size: 0.9rem; background: #2a2a2f; padding: 6px; border-radius: 2px; border: 1px solid #333; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .checkbox-label input { margin-right: 6px; accent-color: var(--accent-color); }
 
-        .btn {
-            font-family: var(--font-header);
-            background: linear-gradient(to bottom, #da1f3d, #8b1426);
-            color: white; border: 1px solid var(--gold); padding: 15px;
-            width: 100%; font-size: 1.1rem; cursor: pointer; letter-spacing: 2px;
-            border-radius: 2px; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-
+        .btn { font-family: var(--font-header); background: linear-gradient(to bottom, #da1f3d, #8b1426); color: white; border: 1px solid var(--gold); padding: 15px; width: 100%; font-size: 1.1rem; cursor: pointer; letter-spacing: 2px; margin-top: 10px; }
         .btn:disabled { opacity: 0.4; cursor: wait; }
         .reset-btn { background: #222; border: 1px solid #444; color: var(--gold); }
         .hidden { display: none !important; }
 
-        #result-banner { 
-            font-family: var(--font-header); font-size: 1.3rem; color: var(--gold); 
-            margin: 15px 0; min-height: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-        
+        #result-banner { font-family: var(--font-header); font-size: 1.3rem; color: var(--gold); margin: 15px 0; min-height: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
         #history-list { list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; }
         #history-list li { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.95rem; color: #ccc; }
         #history-list li span { color: var(--gold); font-weight: bold; font-family: var(--font-header); font-size: 0.8rem; }
@@ -119,7 +97,12 @@
     <button class="global-reset" onclick="triggerFullReset()" title="Reset All">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
-    <div class="subtitle">Gather Your Party</div>
+    <div class="subtitle">Fate of the Modded Realms</div>
+
+    <div class="mod-pack-container">
+        <button class="mod-pack-btn" onclick="injectModPack('races')">+ MODDED RACES</button>
+        <button class="mod-pack-btn" onclick="injectModPack('classes')">+ MODDED CLASSES</button>
+    </div>
     
     <div class="card">
         <h3>Campaign Settings</h3>
@@ -134,7 +117,7 @@
         <h3>I. Race Filters</h3>
         <div id="raceCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addRaceInput" placeholder="Add custom race...">
+            <input type="text" id="addRaceInput" placeholder="Custom race name...">
             <button onclick="addCustomOption('raceCheckboxes', 'addRaceInput', raceData)">+</button>
         </div>
     </div>
@@ -143,7 +126,7 @@
         <h3>II. Class Filters</h3>
         <div id="classCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addClassInput" placeholder="Add custom class...">
+            <input type="text" id="addClassInput" placeholder="Custom class name...">
             <button onclick="addCustomOption('classCheckboxes', 'addClassInput', classData)">+</button>
         </div>
     </div>
@@ -152,7 +135,7 @@
         <h3>III. Background Filters</h3>
         <div id="bgCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addBGInput" placeholder="Add custom background...">
+            <input type="text" id="addBGInput" placeholder="Custom background...">
             <button onclick="addCustomOption('bgCheckboxes', 'addBGInput', backgrounds)">+</button>
         </div>
     </div>
@@ -174,7 +157,6 @@
 </div>
 
 <script>
-    /* Data remains identical to previous version */
     const raceData = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -209,12 +191,33 @@
         const container = document.getElementById(id);
         const keys = Array.isArray(data) ? data : Object.keys(data);
         container.innerHTML = "";
-        keys.forEach(k => {
+        keys.sort().forEach(k => {
             const lbl = document.createElement('label');
             lbl.className = 'checkbox-label';
             lbl.innerHTML = `<input type="checkbox" value="${k}" checked onchange="refreshWheel()"> ${k}`;
             container.appendChild(lbl);
         });
+    }
+
+    function injectModPack(type) {
+        if (type === 'races') {
+            const mods = ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr", "Yuan-ti"];
+            mods.forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; });
+            populate(raceData, 'raceCheckboxes');
+        } else {
+            const mods = {
+                "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"],
+                "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"],
+                "Dread Overlord": ["Standard"],
+                "Magus": ["Arcane Order", "Spellblade"],
+                "Psion": ["Psi Warper", "Telepath"],
+                "Mystic": ["Standard"],
+                "Pugilist": ["Standard"]
+            };
+            Object.assign(classData, mods);
+            populate(classData, 'classCheckboxes');
+        }
+        refreshWheel();
     }
 
     function addCustomOption(containerId, inputId, dataSource) {
@@ -251,8 +254,7 @@
             ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 1.5; ctx.stroke();
             ctx.save(); ctx.translate(250,250); ctx.rotate(i*arc + arc/2);
             ctx.textAlign = "right"; ctx.fillStyle = "#c3a34a";
-            // Updated Font for Slices
-            ctx.font = `bold ${n > 15 ? '10' : '14'}px 'Cinzel'`; 
+            ctx.font = `bold ${n > 15 ? '10' : '13'}px 'Cinzel'`; 
             ctx.fillText(opt.toUpperCase(), 235, 5); ctx.restore();
         });
     }
