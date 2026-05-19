@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BG3 Conditional Character Roller</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-color: #1a1a1e;
+            --accent-color: #da1f3d; /* Baldur's Gate Red */
+            --text-color: #f5f5f7;
+            --text-muted: #a0a0a5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border: 1px solid #2a2a30;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #2a2a30;
+            padding-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Checkbox Grid Layout */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            background: #222227;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            user-select: none;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .checkbox-label:hover {
+            background: #2a2a30;
+        }
+
+        .checkbox-label input {
+            margin-right: 8px;
+            accent-color: var(--accent-color);
+        }
+
+        /* The Display Screen "Wheel" */
+        .display-box {
+            background: #0a0a0c;
+            border: 2px solid #2a2a30;
+            border-radius: 8px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 20px 0;
+            transition: border-color 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .display-box.active-roll {
+            border-color: var(--accent-color);
+            color: #ff4a64;
+            text-shadow: 0 0 10px rgba(218, 31, 61, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #ff2a4b;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>BG3 Character Generator</h1>
+    <div class="subtitle">Conditional Branching Class & Subclass Roller</div>
+
+    <!-- STEP 1: CHOOSE INCLUSIONS -->
+    <div class="card">
+        <h3>1. Filter Available Classes</h3>
+        <div style="margin-bottom: 10px;">
+            <button class="toggle-btn" id="selectAllBtn">Select All</button> | 
+            <button class="toggle-btn" id="selectNoneBtn">Clear All</button>
+        </div>
+        <div class="checkbox-grid" id="checkboxContainer">
+            <!-- JavaScript will populate checkboxes here dynamically -->
+        </div>
+    </div>
+
+    <!-- STEP 2: ROLL MAIN CLASS -->
+    <div class="card">
+        <h3>2. Base Class</h3>
+        <div class="display-box" id="classDisplay">???</div>
+        <button class="btn" id="rollClassBtn">Roll Class</button>
+    </div>
+
+    <!-- STEP 3: ROLL SUBCLASS (HIDDEN UNTIL CLASS IS ROLLED) -->
+    <div class="card hidden" id="subclassCard">
+        <h3>3. Subclass Assignment</h3>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+            Available options for <span id="selectedClassLabel" style="color: white; font-weight: bold;"></span>:
+        </div>
+        <div class="display-box" id="subclassDisplay">???</div>
+        <button class="btn" id="rollSubclassBtn">Roll Subclass</button>
+    </div>
+</div>
+
+<script>
+    // Complete Baldur's Gate 3 Data Set
+    const bg3Data = {
+        "Barbarian": ["Wildheart", "Berserker", "Wild Magic"],
+        "Bard": ["College of Lore", "College of Valor", "College of Swords"],
+        "Cleric": ["Life Domain", "Light Domain", "Trickery Domain", "Knowledge Domain", "Nature Domain", "Tempest Domain", "War Domain"],
+        "Druid": ["Circle of the Moon", "Circle of the Land", "Circle of the Spores"],
+        "Fighter": ["Battle Master", "Champion", "Eldritch Knight"],
+        "Monk": ["Way of the Open Hand", "Way of Shadow", "Way of the Four Elements"],
+        "Paladin": ["Oath of Devotion", "Oath of the Ancients", "Oath of Vengeance", "Oathbreaker"],
+        "Ranger": ["Hunter", "Beast Master", "Gloom Stalker"],
+        "Rogue": ["Thief", "Arcane Trickster", "Assassin"],
+        "Sorcerer": ["Draconic Bloodline", "Wild Magic", "Storm Sorcery"],
+        "Warlock": ["The Fiend", "The Great Old One", "The Archfey"],
+        "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation"]
+    };
+
+    let chosenClass = "";
+    const checkboxContainer = document.getElementById('checkboxContainer');
+    const classDisplay = document.getElementById('classDisplay');
+    const subclassDisplay = document.getElementById('subclassDisplay');
+    const rollClassBtn = document.getElementById('rollClassBtn');
+    const rollSubclassBtn = document.getElementById('rollSubclassBtn');
+    const subclassCard = document.getElementById('subclassCard');
+    const selectedClassLabel = document.getElementById('selectedClassLabel');
+
+    // 1. Setup Class Checkboxes Automatically
+    Object.keys(bg3Data).forEach(className => {
+        const label = document.createElement('label');
+        label.className = 'checkbox-label';
+        label.innerHTML = `<input type="checkbox" value="${className}" checked> ${className}`;
+        checkboxContainer.appendChild(label);
+    });
+
+    // Bulk toggle controls
+    document.getElementById('selectAllBtn').addEventListener('click', () => toggleAllCheckboxes(true));
+    document.getElementById('selectNoneBtn').addEventListener('click', () => toggleAllCheckboxes(false));
+
+    function toggleAllCheckboxes(status) {
+        checkboxContainer.querySelectorAll('input').forEach(cb => cb.checked = status);
+    }
+
+    // 2. The Shuffle Animation "Wheel" Simulation Logic
+    function runShuffleAnimation(optionsPool, displayElement, callback) {
+        displayElement.classList.add('active-roll');
+        let iterations = 0;
+        let speed = 40; // Starts fast (ms per switch)
+        
+        function shuffle() {
+            // Get a random element from the pool
+            const randomPick = optionsPool[Math.floor(Math.random() * optionsPool.length)];
+            displayElement.innerText = randomPick;
+            
+            iterations++;
+            
+            // Gradually slow down the speed over time
+            if (iterations < 20) {
+                setTimeout(shuffle, speed);
+            } else if (iterations < 30) {
+                setTimeout(shuffle, speed * 2.5);
+            } else if (iterations < 35) {
+                setTimeout(shuffle, speed * 5);
+            } else {
+                // Done! Halt and trigger next step
+                displayElement.classList.remove('active-roll');
+                callback(randomPick);
+            }
+        }
+        shuffle();
+    }
+
+    // 3. Roll Class Logic
+    rollClassBtn.addEventListener('click', () => {
+        // Collect checked classes
+        const checkedInputs = checkboxContainer.querySelectorAll('input:checked');
+        const allowedClasses = Array.from(checkedInputs).map(input => input.value);
+
+        if (allowedClasses.length === 0) {
+            alert("Please check at least one class to roll!");
+            return;
+        }
+
+        // Reset subclass UI state
+        subclassCard.classList.add('hidden');
+        subclassDisplay.innerText = "???";
+        rollClassBtn.disabled = true;
+
+        runShuffleAnimation(allowedClasses, classDisplay, (winner) => {
+            chosenClass = winner;
+            rollClassBtn.disabled = false;
+            
+            // Setup and reveal subclass requirements
+            selectedClassLabel.innerText = chosenClass;
+            subclassCard.classList.remove('hidden');
+        });
+    });
+
+    // 4. Roll Subclass Logic
+    rollSubclassBtn.addEventListener('click', () => {
+        const allowedSubclasses = bg3Data[chosenClass];
+        rollSubclassBtn.disabled = true;
+        rollClassBtn.disabled = true;
+
+        runShuffleAnimation(allowedSubclasses, subclassDisplay, (winner) => {
+            rollSubclassBtn.disabled = false;
+            rollClassBtn.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
