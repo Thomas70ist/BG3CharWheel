@@ -180,4 +180,173 @@
     };
 
     const classData = {
-        "Barbarian": ["Wildheart", "Berserker", "
+        "Barbarian": ["Wildheart", "Berserker", "Wild Magic", "Giant"],
+        "Bard": ["Lore", "Valor", "Swords", "Glamour"],
+        "Cleric": ["Life", "Light", "Trickery", "Knowledge", "Nature", "Tempest", "War", "Death"],
+        "Druid": ["Moon", "Land", "Spores", "Stars"],
+        "Fighter": ["Battle Master", "Champion", "Eldritch Knight", "Arcane Archer"],
+        "Monk": ["Open Hand", "Shadow", "Elements", "Drunken Master"],
+        "Paladin": ["Devotion", "Ancients", "Vengeance", "Crown", "Oathbreaker"],
+        "Ranger": ["Hunter", "Beast Master", "Gloom Stalker", "Swarmkeeper"],
+        "Rogue": ["Thief", "Arcane Trickster", "Assassin", "Swashbuckler"],
+        "Sorcerer": ["Draconic", "Wild Magic", "Storm", "Shadow"],
+        "Warlock": ["Fiend", "Great Old One", "Archfey", "Hexblade"],
+        "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation", "Bladesinging"]
+    };
+
+    const backgrounds = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Noble", "Outlander", "Sage", "Soldier", "Urchin"];
+
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const mainBtn = document.getElementById('mainBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultBanner = document.getElementById('result-banner');
+    const historyList = document.getElementById('history-list');
+
+    let currentRotation = 0;
+    let rollState = "RACE"; 
+    let sessionResult = { race: "", subrace: "", class: "", subclass: "", background: "" };
+
+    function setupCheckboxes(list, containerId) {
+        const container = document.getElementById(containerId);
+        const items = Array.isArray(list) ? list : Object.keys(list);
+        items.forEach(key => {
+            const lbl = document.createElement('label');
+            lbl.className = 'checkbox-label';
+            lbl.innerHTML = `<input type="checkbox" data-type="${containerId}" value="${key}" checked> ${key}`;
+            container.appendChild(lbl);
+        });
+    }
+
+    setupCheckboxes(raceData, 'raceCheckboxes');
+    setupCheckboxes(classData, 'classCheckboxes');
+    setupCheckboxes(backgrounds, 'bgCheckboxes');
+
+    function toggleSet(containerId, state) {
+        document.querySelectorAll(`input[data-type="${containerId}"]`).forEach(i => i.checked = state);
+        if((rollState === "RACE" && containerId === "raceCheckboxes") || 
+           (rollState === "CLASS" && containerId === "classCheckboxes") || 
+           (rollState === "BACKGROUND" && containerId === "bgCheckboxes")) refreshWheel();
+    }
+
+    function getSelected(containerId) {
+        return Array.from(document.querySelectorAll(`input[data-type="${containerId}"]:checked`)).map(i => i.value);
+    }
+
+    function drawWheel(options) {
+        const numSlices = options.length;
+        if (numSlices === 0) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+        const arc = (Math.PI * 2) / numSlices;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        options.forEach((opt, i) => {
+            const angle = i * arc;
+            ctx.fillStyle = i % 2 === 0 ? "#1a1a1e" : "#2a2a30";
+            ctx.beginPath(); ctx.moveTo(250, 250);
+            ctx.arc(250, 250, 250, angle, angle + arc); ctx.fill();
+            ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.save(); ctx.translate(250, 250); ctx.rotate(angle + arc / 2);
+            ctx.textAlign = "right"; ctx.fillStyle = "#f5f5f7";
+            ctx.font = `bold ${options.length > 15 ? '12' : '16'}px sans-serif`; 
+            ctx.fillText(opt, 230, 6); ctx.restore();
+        });
+    }
+
+    function refreshWheel() {
+        if (rollState === "RACE") drawWheel(getSelected('raceCheckboxes'));
+        if (rollState === "CLASS") drawWheel(getSelected('classCheckboxes'));
+        if (rollState === "BACKGROUND") drawWheel(getSelected('bgCheckboxes'));
+    }
+
+    function resetRotation() {
+        currentRotation = 0;
+        canvas.style.transition = 'none';
+        canvas.style.transform = 'rotate(0deg)';
+        setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
+    }
+
+    function spin(options, onEnd) {
+        if (options.length === 0) { alert("Check some boxes first!"); return; }
+        const spinRoll = 1800 + Math.floor(Math.random() * 360);
+        currentRotation += spinRoll;
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+        mainBtn.disabled = true;
+        setTimeout(() => {
+            const netRotation = currentRotation % 360;
+            const sliceSize = 360 / options.length;
+            const winningIndex = Math.floor(((360 - netRotation + 270) % 360) / sliceSize);
+            onEnd(options[winningIndex]);
+        }, 5100);
+    }
+
+    resetBtn.onclick = () => {
+        rollState = "RACE";
+        sessionResult = { race: "", subrace: "", class: "", subclass: "", background: "" };
+        mainBtn.innerText = "SPIN FOR RACE";
+        mainBtn.classList.remove('hidden');
+        resetBtn.classList.add('hidden');
+        resultBanner.innerText = "Click to begin...";
+        resetRotation();
+        refreshWheel();
+    };
+
+    mainBtn.onclick = () => {
+        if (rollState === "RACE") {
+            spin(getSelected('raceCheckboxes'), (winner) => {
+                sessionResult.race = winner;
+                resultBanner.innerText = winner;
+                const subs = raceData[winner];
+                if (subs.length > 1 || subs[0] !== "Standard") {
+                    rollState = "SUBRACE"; mainBtn.innerText = "SPIN FOR SUB-RACE";
+                    mainBtn.disabled = false; resetRotation(); drawWheel(subs);
+                } else {
+                    sessionResult.subrace = ""; rollState = "CLASS";
+                    mainBtn.innerText = "SPIN FOR CLASS";
+                    mainBtn.disabled = false; resetRotation(); drawWheel(getSelected('classCheckboxes'));
+                }
+            });
+        } 
+        else if (rollState === "SUBRACE") {
+            spin(raceData[sessionResult.race], (winner) => {
+                sessionResult.subrace = winner;
+                resultBanner.innerText = `${winner} ${sessionResult.race}`;
+                rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS";
+                mainBtn.disabled = false; resetRotation(); drawWheel(getSelected('classCheckboxes'));
+            });
+        }
+        else if (rollState === "CLASS") {
+            spin(getSelected('classCheckboxes'), (winner) => {
+                sessionResult.class = winner; resultBanner.innerText = winner;
+                rollState = "SUBCLASS"; mainBtn.innerText = "SPIN FOR SUB-CLASS";
+                mainBtn.disabled = false; resetRotation(); drawWheel(classData[winner]);
+            });
+        }
+        else if (rollState === "SUBCLASS") {
+            spin(classData[sessionResult.class], (winner) => {
+                sessionResult.subclass = winner; resultBanner.innerText = `${sessionResult.class} (${winner})`;
+                rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND";
+                mainBtn.disabled = false; resetRotation(); drawWheel(getSelected('bgCheckboxes'));
+            });
+        }
+        else if (rollState === "BACKGROUND") {
+            spin(getSelected('bgCheckboxes'), (winner) => {
+                sessionResult.background = winner;
+                const r = sessionResult;
+                const raceStr = r.subrace ? `${r.subrace} ${r.race}` : r.race;
+                const finalResult = `[${winner}] ${raceStr} | ${r.class} (${r.subclass})`;
+                resultBanner.innerText = finalResult;
+                
+                if (historyList.innerHTML.includes("No rolls yet")) historyList.innerHTML = "";
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${finalResult}</span>`;
+                historyList.prepend(li);
+
+                mainBtn.classList.add('hidden');
+                resetBtn.classList.remove('hidden');
+            });
+        }
+    };
+
+    refreshWheel();
+</script>
+</body>
+</html>
