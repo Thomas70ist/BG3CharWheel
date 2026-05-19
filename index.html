@@ -22,7 +22,7 @@
             font-family: var(--font-body);
             background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
-            font-size: 1.3rem; /* Increased base size */
+            font-size: 1.3rem;
         }
 
         .container { max-width: 850px; width: 100%; text-align: center; position: relative; }
@@ -30,64 +30,66 @@
         .global-reset {
             position: absolute; top: 0; right: 0;
             background: rgba(255,255,255,0.05); border: 1px solid var(--gold); color: var(--gold);
-            border-radius: 4px; width: 45px; height: 45px; cursor: pointer;
+            border-radius: 4px; width: 50px; height: 50px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; transition: 0.3s; z-index: 1000;
+            font-size: 1.6rem; transition: 0.3s; z-index: 1000;
         }
         .global-reset:hover { background: var(--accent-color); color: white; border-color: white; transform: rotate(-180deg); }
 
-        h1 { font-family: var(--font-header); margin-bottom: 5px; color: var(--gold); letter-spacing: 5px; font-size: 2.5rem; text-shadow: 0 4px 8px rgba(0,0,0,0.7); }
-        .subtitle { font-family: var(--font-header); color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 3px; }
+        h1 { font-family: var(--font-header); margin-bottom: 5px; color: var(--gold); letter-spacing: 5px; font-size: 2.8rem; text-shadow: 0 4px 8px rgba(0,0,0,0.7); }
+        .subtitle { font-family: var(--font-header); color: var(--text-muted); font-size: 1rem; margin-bottom: 25px; letter-spacing: 3px; }
 
         .mod-pack-container { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
         .mod-pack-btn { 
             background: #25252a; border: 1px solid var(--gold); color: var(--gold); 
-            padding: 12px 20px; font-family: var(--font-header); font-size: 0.85rem; 
+            padding: 14px 22px; font-family: var(--font-header); font-size: 0.9rem; 
             cursor: pointer; border-radius: 4px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .mod-pack-btn:hover { background: var(--gold); color: black; }
 
         .step-selector {
-            display: flex; justify-content: center; gap: 30px; margin-bottom: 20px;
-            background: #25252a; padding: 15px; border-radius: 4px; border: 1px solid var(--gold);
+            display: flex; justify-content: center; gap: 35px; margin-bottom: 25px;
+            background: #25252a; padding: 18px; border-radius: 4px; border: 1px solid var(--gold);
         }
-        .step-toggle { font-family: var(--font-header); font-size: 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--gold); }
-        .step-toggle input { transform: scale(1.4); accent-color: var(--gold); }
+        .step-toggle { font-family: var(--font-header); font-size: 1.1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--gold); }
+        .step-toggle input { transform: scale(1.5); accent-color: var(--gold); }
 
         .wheel-wrapper {
-            position: relative; width: 400px; height: 400px; /* Bigger Wheel */
-            margin: 30px auto; border: 8px solid var(--gold);
-            border-radius: 50%; box-shadow: 0 0 50px rgba(0,0,0,0.9); background: #1a1a1e;
+            position: relative; width: 420px; height: 420px;
+            margin: 35px auto; border: 8px solid var(--gold);
+            border-radius: 50%; box-shadow: 0 0 60px rgba(0,0,0,0.9); background: #1a1a1e;
         }
 
         .pointer {
-            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--gold); z-index: 100;
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-top: 45px solid var(--gold); z-index: 100;
         }
 
         canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
 
-        .card { background-color: var(--card-color); border: 1px solid #3e3e42; border-radius: 4px; padding: 20px; margin-bottom: 20px; text-align: left; }
-        .card h3 { font-family: var(--font-header); margin-top: 0; font-size: 1rem; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 15px; }
+        .card { background-color: var(--card-color); border: 1px solid #3e3e42; border-radius: 4px; padding: 25px; margin-bottom: 20px; text-align: left; }
+        .card h3 { font-family: var(--font-header); margin-top: 0; font-size: 1.1rem; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 18px; }
         .card.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
 
-        .add-custom { display: flex; gap: 10px; width: 100%; margin-top: 15px; }
-        .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 10px 15px; font-family: var(--font-body); font-size: 1rem; }
-        .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 25px; cursor: pointer; font-family: var(--font-header); font-size: 1.2rem; }
+        .add-custom { display: flex; gap: 12px; width: 100%; margin-top: 20px; }
+        .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 12px 18px; font-family: var(--font-body); font-size: 1.1rem; border-radius: 4px; }
+        .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 30px; cursor: pointer; font-family: var(--font-header); font-size: 1.3rem; border-radius: 4px; }
 
-        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .checkbox-label { font-size: 1.1rem; background: #2a2a2f; padding: 10px; border-radius: 4px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; }
-        .checkbox-label input { transform: scale(1.3); margin-right: 10px; accent-color: var(--accent-color); }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+        .checkbox-label { font-size: 1.2rem; background: #2a2a2f; padding: 12px; border-radius: 4px; border: 1px solid #333; cursor: pointer; display: flex; align-items: center; transition: 0.2s; }
+        .checkbox-label:hover { border-color: var(--gold); background: #323238; }
+        .checkbox-label input { transform: scale(1.4); margin-right: 12px; accent-color: var(--accent-color); }
 
-        .btn { font-family: var(--font-header); background: linear-gradient(to bottom, #da1f3d, #8b1426); color: white; border: 1px solid var(--gold); padding: 20px; width: 100%; font-size: 1.5rem; cursor: pointer; letter-spacing: 3px; margin-top: 15px; }
+        .btn { font-family: var(--font-header); background: linear-gradient(to bottom, #da1f3d, #8b1426); color: white; border: 1px solid var(--gold); padding: 22px; width: 100%; font-size: 1.7rem; cursor: pointer; letter-spacing: 4px; margin-top: 20px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .btn:hover { filter: brightness(1.2); }
         .btn:disabled { opacity: 0.4; cursor: wait; }
         .reset-btn { background: #222; border: 1px solid #444; color: var(--gold); }
         .hidden { display: none !important; }
 
-        #result-banner { font-family: var(--font-header); font-size: 1.8rem; color: var(--gold); margin: 25px 0; min-height: 4rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); line-height: 1.2; }
-        #history-list { list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; }
-        #history-list li { padding: 12px 0; border-bottom: 1px solid #333; font-size: 1.1rem; color: #ccc; }
-        #history-list li span { color: var(--gold); font-weight: bold; font-family: var(--font-header); font-size: 0.9rem; }
+        #result-banner { font-family: var(--font-header); font-size: 2rem; color: var(--gold); margin: 30px 0; min-height: 4.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); line-height: 1.3; }
+        #history-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
+        #history-list li { padding: 15px 0; border-bottom: 1px solid #333; font-size: 1.2rem; color: #ccc; }
+        #history-list li span { color: var(--gold); font-weight: bold; font-family: var(--font-header); font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -156,7 +158,6 @@
 </div>
 
 <script>
-    // Store original defaults for "Deep Reset"
     const defaultRaces = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -246,14 +247,16 @@
             ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
             ctx.save(); ctx.translate(250,250); ctx.rotate(i*arc + arc/2);
             ctx.textAlign = "right"; ctx.fillStyle = "#c3a34a";
-            ctx.font = `bold ${n > 12 ? '12' : '16'}px 'Cinzel'`; 
+            ctx.font = `bold ${n > 12 ? '14' : '18'}px 'Cinzel'`; 
             ctx.fillText(opt.toUpperCase(), 235, 6); ctx.restore();
         });
     }
 
     function refreshWheel() {
         if (rollState === "RACE" || rollState === "START") drawWheel(getActive('raceCheckboxes'));
+        else if (rollState === "SUBRACE") drawWheel(raceData[sessionResult.race]);
         else if (rollState === "CLASS" || rollState === "CLASS_PENDING") drawWheel(getActive('classCheckboxes'));
+        else if (rollState === "SUBCLASS") drawWheel(classData[sessionResult.class]);
         else if (rollState === "BACKGROUND" || rollState === "BG_PENDING") drawWheel(getActive('bgCheckboxes'));
     }
 
@@ -262,17 +265,35 @@
         setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; if(callback) callback(); }, 50);
     }
 
+    function spin(options, onEnd) {
+        if (options.length === 0) return alert("Select options first!");
+        const roll = 1800 + Math.floor(Math.random()*360);
+        currentRotation += roll;
+        canvas.style.transform = `rotate(${currentRotation}deg)`;
+        mainBtn.disabled = true;
+        setTimeout(() => {
+            const idx = Math.floor(((360 - (currentRotation%360) + 270) % 360) / (360/options.length));
+            onEnd(options[idx]);
+        }, 5100);
+    }
+
     function nextStep() {
         mainBtn.disabled = false;
         if (rollState === "START") {
-            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; hardResetWheel(() => drawWheel(getActive('raceCheckboxes'))); } 
-            else { sessionResult.race = "Custom"; rollState = "CLASS_PENDING"; nextStep(); }
+            if (document.getElementById('spinRace').checked) {
+                rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE";
+                hardResetWheel(() => drawWheel(getActive('raceCheckboxes')));
+            } else { sessionResult.race = "Custom"; sessionResult.subrace = ""; rollState = "CLASS_PENDING"; nextStep(); }
         } else if (rollState === "CLASS_PENDING") {
-            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; hardResetWheel(() => drawWheel(getActive('classCheckboxes'))); } 
-            else { sessionResult.class = "Custom"; sessionResult.subclass = "Custom"; rollState = "BG_PENDING"; nextStep(); }
+            if (document.getElementById('spinClass').checked) {
+                rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS";
+                hardResetWheel(() => drawWheel(getActive('classCheckboxes')));
+            } else { sessionResult.class = "Custom"; sessionResult.subclass = "Custom"; rollState = "BG_PENDING"; nextStep(); }
         } else if (rollState === "BG_PENDING") {
-            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; hardResetWheel(() => drawWheel(getActive('bgCheckboxes'))); } 
-            else { sessionResult.background = "Custom"; finalize(); }
+            if (document.getElementById('spinBG').checked) {
+                rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND";
+                hardResetWheel(() => drawWheel(getActive('bgCheckboxes')));
+            } else { sessionResult.background = "Custom"; finalize(); }
         }
     }
 
@@ -288,15 +309,12 @@
     }
 
     function triggerTotalWipe() {
-        // Deep reset of data
         raceData = JSON.parse(JSON.stringify(defaultRaces));
         classData = JSON.parse(JSON.stringify(defaultClasses));
         backgrounds = [...defaultBGs];
-        // Reset UI
         populate(raceData, 'raceCheckboxes');
         populate(classData, 'classCheckboxes');
         populate(backgrounds, 'bgCheckboxes');
-        // Reset Logic
         rollState = "START"; mainBtn.innerText = "BEGIN JOURNEY";
         mainBtn.classList.remove('hidden'); mainBtn.disabled = false;
         resetBtn.classList.add('hidden'); resultBanner.innerText = "Fate awaits...";
@@ -305,12 +323,43 @@
     }
 
     mainBtn.onclick = () => {
-        if (rollState === "START") nextStep();
-        else if (rollState === "RACE") { spin(getActive('raceCheckboxes'), (win) => { sessionResult.race = win; resultBanner.innerText = win; const subs = raceData[win]; if (subs.length > 1 || (subs.length === 1 && subs[0] !== "Standard")) { rollState = "SUBRACE"; mainBtn.innerText = "SPIN FOR SUB-RACE"; mainBtn.disabled = false; hardResetWheel(() => drawWheel(subs)); } else { rollState = "CLASS_PENDING"; nextStep(); } }); }
-        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerText = `${win} ${sessionResult.race}`; rollState = "CLASS_PENDING"; nextStep(); }); }
-        else if (rollState === "CLASS") { spin(getActive('classCheckboxes'), (win) => { sessionResult.class = win; resultBanner.innerText = win; rollState = "SUBCLASS"; mainBtn.innerText = "SPIN FOR SUB-CLASS"; mainBtn.disabled = false; hardResetWheel(() => drawWheel(classData[win])); }); }
-        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerText = `${sessionResult.class} (${win})`; rollState = "BG_PENDING"; nextStep(); }); }
-        else if (rollState === "BACKGROUND") { spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); }); }
+        if (rollState === "START") {
+            nextStep(); // This now correctly sets the phase to RACE or skips
+        } 
+        else if (rollState === "RACE") {
+            spin(getActive('raceCheckboxes'), (win) => {
+                sessionResult.race = win; resultBanner.innerText = win;
+                const subs = raceData[win];
+                if (subs && (subs.length > 1 || (subs.length === 1 && subs[0] !== "Standard"))) {
+                    rollState = "SUBRACE"; mainBtn.innerText = "SPIN FOR SUB-RACE";
+                    mainBtn.disabled = false; hardResetWheel(() => drawWheel(subs));
+                } else { rollState = "CLASS_PENDING"; nextStep(); }
+            });
+        } 
+        else if (rollState === "SUBRACE") {
+            spin(raceData[sessionResult.race], (win) => {
+                sessionResult.subrace = win; resultBanner.innerText = `${win} ${sessionResult.race}`;
+                rollState = "CLASS_PENDING"; nextStep();
+            });
+        } 
+        else if (rollState === "CLASS") {
+            spin(getActive('classCheckboxes'), (win) => {
+                sessionResult.class = win; resultBanner.innerText = win;
+                rollState = "SUBCLASS"; mainBtn.innerText = "SPIN FOR SUB-CLASS";
+                mainBtn.disabled = false; hardResetWheel(() => drawWheel(classData[win]));
+            });
+        } 
+        else if (rollState === "SUBCLASS") {
+            spin(classData[sessionResult.class], (win) => {
+                sessionResult.subclass = win; resultBanner.innerText = `${sessionResult.class} (${win})`;
+                rollState = "BG_PENDING"; nextStep();
+            });
+        } 
+        else if (rollState === "BACKGROUND") {
+            spin(getActive('bgCheckboxes'), (win) => {
+                sessionResult.background = win; finalize();
+            });
+        }
     }
 
     resetBtn.onclick = triggerTotalWipe;
