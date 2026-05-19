@@ -88,13 +88,17 @@
         .add-custom { display: flex; gap: 12px; width: 100%; margin-top: 20px; }
         .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 12px; font-family: var(--font-body); font-size: 1.1rem; }
         .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 30px; cursor: pointer; font-family: var(--font-header); }
+        
+        #history-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; text-align: left; }
+        #history-list li { padding: 15px; border-bottom: 1px solid #333; color: #ccc; font-size: 1.1rem; }
+        #history-list li span { color: var(--gold); font-family: var(--font-header); font-size: 0.9rem; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button class="global-reset" onclick="triggerTotalWipe()" title="Factory Reset All Data">⟳</button>
+    <button class="global-reset" onclick="location.reload()" title="Full Reset Page">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
     <div class="subtitle">Fate of the Modded Realms</div>
@@ -158,7 +162,7 @@
 
     <div class="card" style="margin-top: 30px;">
         <h3>Chronicles of Fate</h3>
-        <ul id="history-list"><li style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li></ul>
+        <ul id="history-list"><li id="history-placeholder" style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li></ul>
     </div>
 </div>
 
@@ -168,17 +172,17 @@
         "Trans-Female": "fa-solid fa-venus-double", "Non-Binary": "fa-solid fa-genderless",
         "Barbarian": "fa-solid fa-hand-fist", "Bard": "fa-solid fa-guitar", "Cleric": "fa-solid fa-ankh",
         "Druid": "fa-solid fa-leaf", "Fighter": "fa-solid fa-shield-halved", "Monk": "fa-solid fa-shoe-prints",
-        "Paladin": "fa-solid fa-sun", "Ranger": "fa-solid fa-bow-arrow", "Rogue": "fa-solid fa-user-ninja",
+        "Paladin": "fa-solid fa-sun", "Ranger": "fa-solid fa-paw", "Rogue": "fa-solid fa-user-ninja",
         "Sorcerer": "fa-solid fa-wand-magic-sparkles", "Warlock": "fa-solid fa-eye", "Wizard": "fa-solid fa-hat-wizard",
         "Artificer": "fa-solid fa-gears", "Blood Hunter": "fa-solid fa-droplet",
         "Elf": "fa-solid fa-clover", "Tiefling": "fa-solid fa-fire", "Drow": "fa-solid fa-moon",
-        "Human": "fa-solid fa-person", "Githyanki": "fa-solid fa-dragon", "Dwarf": "fa-solid fa-mountain",
+        "Human": "fa-solid fa-person", "Githyanki": "fa-solid fa-worm", "Dwarf": "fa-solid fa-mountain",
         "Half-Elf": "fa-solid fa-dna", "Halfling": "fa-solid fa-wheat-awn", "Gnome": "fa-solid fa-flask",
-        "Dragonborn": "fa-solid fa-worm", "Half-Orc": "fa-solid fa-skull",
+        "Dragonborn": "fa-solid fa-dragon", "Half-Orc": "fa-solid fa-skull",
         "Acolyte": "fa-solid fa-scroll", "Charlatan": "fa-solid fa-masks-theater", "Criminal": "fa-solid fa-sack-dollar",
         "Entertainer": "fa-solid fa-music", "Folk Hero": "fa-solid fa-hammer", "Guild Artisan": "fa-solid fa-toolbox",
         "Noble": "fa-solid fa-crown", "Outlander": "fa-solid fa-map", "Sage": "fa-solid fa-book", 
-        "Soldier": "fa-solid fa-medal", "Urchin": "fa-solid fa-rat"
+        "Soldier": "fa-solid fa-medal", "Urchin": "fa-solid fa-hand-holding"
     };
 
     const classColors = {
@@ -215,6 +219,7 @@
     const mainBtn = document.getElementById('mainBtn');
     const resetBtn = document.getElementById('resetBtn');
     const resultBanner = document.getElementById('result-banner');
+    const historyList = document.getElementById('history-list');
 
     let currentRotation = 0;
     let rollState = "START"; 
@@ -289,12 +294,11 @@
     }
 
     function finalize() {
-        mainBtn.disabled = false; // Fix: ensure button is clickable if logic error occurs
         const r = sessionResult;
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
         const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         
-        // Icon Row
+        // Update Banner
         resultBanner.innerHTML = `
             <div class="result-icons">
                 ${r.gender ? getIconHTML(r.gender) : ''}
@@ -305,13 +309,32 @@
             <div class="result-text">${total}</div>
         `;
 
+        // Add to History List
+        const placeholder = document.getElementById('history-placeholder');
+        if (placeholder) placeholder.remove();
+
+        const li = document.createElement('li');
+        li.innerHTML = `<span>ENTRY #${historyList.children.length + 1}</span><br>${total}`;
+        historyList.prepend(li);
+
         mainBtn.classList.add('hidden');
         resetBtn.classList.remove('hidden');
+        mainBtn.disabled = false;
     }
 
     function resetWheelPos(cb) {
         canvas.style.transition = 'none'; canvas.style.transform = 'rotate(0deg)'; currentRotation = 0;
-        setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; cb(); }, 50);
+        setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; if(cb) cb(); }, 50);
+    }
+
+    function softReset() {
+        rollState = "START";
+        sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
+        resultBanner.innerText = "Fate awaits...";
+        mainBtn.innerText = "BEGIN JOURNEY";
+        mainBtn.classList.remove('hidden');
+        resetBtn.classList.add('hidden');
+        resetWheelPos(() => refreshWheel());
     }
 
     function refreshWheel() {
@@ -352,14 +375,14 @@
         else if (rollState === "BACKGROUND") { spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); }); }
     };
 
-    resetBtn.onclick = () => location.reload();
+    resetBtn.onclick = softReset;
 
-    function triggerTotalWipe() { location.reload(); }
     function injectModPack(type) {
         if (type === 'races') { ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; }); populate(raceData, 'raceCheckboxes'); }
         else { Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] }); populate(classData, 'classCheckboxes'); }
         refreshWheel();
     }
+    
     function addCustomOption(containerId, inputId, dataSource) {
         const input = document.getElementById(inputId); const val = input.value.trim(); if (!val) return;
         if (Array.isArray(dataSource)) { if (!dataSource.includes(val)) dataSource.push(val); } else { if (!dataSource[val]) dataSource[val] = ["Standard"]; }
