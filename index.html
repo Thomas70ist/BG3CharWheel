@@ -20,7 +20,18 @@
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { max-width: 650px; width: 100%; text-align: center; }
+        .container { max-width: 650px; width: 100%; text-align: center; position: relative; }
+        
+        /* Global Reset Icon */
+        .global-reset {
+            position: absolute; top: 5px; right: 10px;
+            background: none; border: 1px solid #444; color: var(--text-muted);
+            border-radius: 50%; width: 30px; height: 30px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: 0.2s; z-index: 1000;
+        }
+        .global-reset:hover { border-color: var(--accent-color); color: var(--accent-color); transform: rotate(-90deg); }
+
         h1 { margin-bottom: 5px; color: var(--gold); letter-spacing: 2px; font-size: 1.5rem; }
         .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px; }
 
@@ -75,6 +86,8 @@
 <body>
 
 <div class="container">
+    <button class="global-reset" onclick="triggerFullReset()" title="Reset All">⟳</button>
+    
     <h1>BG3 ADVENTURE ROLLER</h1>
     
     <div class="card">
@@ -238,42 +251,29 @@
 
     function nextStep() {
         mainBtn.disabled = false;
-        
-        // RACE PHASE
         if (rollState === "START") {
             if (document.getElementById('spinRace').checked) {
-                rollState = "RACE";
-                mainBtn.innerText = "SPIN FOR RACE";
+                rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE";
                 hardResetWheel(() => drawWheel(getActive('raceCheckboxes')));
             } else {
-                sessionResult.race = "Custom"; 
-                sessionResult.subrace = "";
-                rollState = "CLASS_PENDING"; // Skip directly to class check
-                nextStep();
+                sessionResult.race = "Custom"; rollState = "CLASS_PENDING"; nextStep();
             }
         } 
-        // CLASS PHASE
         else if (rollState === "CLASS_PENDING") {
             if (document.getElementById('spinClass').checked) {
-                rollState = "CLASS";
-                mainBtn.innerText = "SPIN FOR CLASS";
+                rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS";
                 hardResetWheel(() => drawWheel(getActive('classCheckboxes')));
             } else {
-                sessionResult.class = "Custom";
-                sessionResult.subclass = "Custom";
-                rollState = "BG_PENDING"; // Skip directly to background check
-                nextStep();
+                sessionResult.class = "Custom"; sessionResult.subclass = "Custom";
+                rollState = "BG_PENDING"; nextStep();
             }
         }
-        // BACKGROUND PHASE
         else if (rollState === "BG_PENDING") {
             if (document.getElementById('spinBG').checked) {
-                rollState = "BACKGROUND";
-                mainBtn.innerText = "SPIN FOR BACKGROUND";
+                rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND";
                 hardResetWheel(() => drawWheel(getActive('bgCheckboxes')));
             } else {
-                sessionResult.background = "Custom";
-                finalize();
+                sessionResult.background = "Custom"; finalize();
             }
         }
     }
@@ -290,18 +290,15 @@
     }
 
     mainBtn.onclick = () => {
-        if (rollState === "START") {
-            nextStep();
-        } else if (rollState === "RACE") {
+        if (rollState === "START") nextStep();
+        else if (rollState === "RACE") {
             spin(getActive('raceCheckboxes'), (win) => {
                 sessionResult.race = win; resultBanner.innerText = win;
                 const subs = raceData[win];
                 if (subs.length > 1 || (subs.length === 1 && subs[0] !== "Standard")) {
                     rollState = "SUBRACE"; mainBtn.innerText = "SPIN FOR SUB-RACE";
                     mainBtn.disabled = false; hardResetWheel(() => drawWheel(subs));
-                } else {
-                    rollState = "CLASS_PENDING"; nextStep();
-                }
+                } else { rollState = "CLASS_PENDING"; nextStep(); }
             });
         } else if (rollState === "SUBRACE") {
             spin(raceData[sessionResult.race], (win) => {
@@ -326,14 +323,15 @@
         }
     }
 
-    resetBtn.onclick = () => {
+    function triggerFullReset() {
         rollState = "START"; mainBtn.innerText = "BEGIN JOURNEY";
         mainBtn.classList.remove('hidden'); mainBtn.disabled = false;
         resetBtn.classList.add('hidden'); resultBanner.innerText = "Ready to start?";
         sessionResult = { race: "", subrace: "", class: "", subclass: "", background: "" };
         hardResetWheel(() => refreshWheel());
-    };
+    }
 
+    resetBtn.onclick = triggerFullReset;
     window.onload = refreshWheel;
 </script>
 </body>
