@@ -49,11 +49,11 @@
         .mod-pack-btn:hover { background: var(--gold); color: black; }
 
         .step-selector {
-            display: flex; justify-content: center; gap: 35px; margin-bottom: 25px;
-            background: #25252a; padding: 18px; border-radius: 4px; border: 1px solid var(--gold);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;
+            background: #25252a; padding: 18px; border-radius: 4px; border: 1px solid var(--gold); margin-bottom: 25px;
         }
-        .step-toggle { font-family: var(--font-header); font-size: 1.1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--gold); }
-        .step-toggle input { transform: scale(1.5); accent-color: var(--gold); }
+        .step-toggle { font-family: var(--font-header); font-size: 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--gold); justify-content: center; }
+        .step-toggle input { transform: scale(1.3); accent-color: var(--gold); }
 
         .wheel-wrapper {
             position: relative; width: 420px; height: 420px;
@@ -84,7 +84,7 @@
         #result-banner { font-family: var(--font-header); font-size: 1.8rem; color: var(--gold); margin: 30px 0; min-height: 5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
         #result-banner i { display: block; font-size: 3rem; margin-bottom: 10px; color: var(--gold); }
 
-        #history-list li span { color: var(--gold); font-weight: bold; font-family: var(--font-header); font-size: 1rem; }
+        .add-custom { display: flex; gap: 12px; width: 100%; margin-top: 20px; }
         .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 12px; font-family: var(--font-body); font-size: 1.1rem; }
         .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 30px; cursor: pointer; font-family: var(--font-header); }
     </style>
@@ -95,7 +95,7 @@
     <button class="global-reset" onclick="triggerTotalWipe()" title="Factory Reset All Data">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
-    <div class="subtitle">Gather Your Party</div>
+    <div class="subtitle">Fate of the Modded Realms</div>
 
     <div class="mod-pack-container">
         <button class="mod-pack-btn" onclick="injectModPack('races')">+ LOAD MODDED RACES</button>
@@ -105,14 +105,20 @@
     <div class="card">
         <h3>Campaign Settings</h3>
         <div class="step-selector">
+            <label class="step-toggle"><input type="checkbox" id="spinGender" checked onchange="syncUI()"> Gender</label>
             <label class="step-toggle"><input type="checkbox" id="spinRace" checked onchange="syncUI()"> Race</label>
             <label class="step-toggle"><input type="checkbox" id="spinClass" checked onchange="syncUI()"> Class</label>
             <label class="step-toggle"><input type="checkbox" id="spinBG" checked onchange="syncUI()"> Background</label>
         </div>
     </div>
 
+    <div class="card" id="cardGender">
+        <h3>I. Identity Filters</h3>
+        <div id="genderCheckboxes" class="checkbox-grid"></div>
+    </div>
+
     <div class="card" id="cardRace">
-        <h3>I. Race Filters</h3>
+        <h3>II. Race Filters</h3>
         <div id="raceCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
             <input type="text" id="addRaceInput" placeholder="Add custom race (e.g. Aasimar)">
@@ -121,7 +127,7 @@
     </div>
 
     <div class="card" id="cardClass">
-        <h3>II. Class Filters</h3>
+        <h3>III. Class Filters</h3>
         <div id="classCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
             <input type="text" id="addClassInput" placeholder="Add custom class (e.g. Artificer)">
@@ -130,7 +136,7 @@
     </div>
 
     <div class="card" id="cardBG">
-        <h3>III. Background Filters</h3>
+        <h3>IV. Background Filters</h3>
         <div id="bgCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
             <input type="text" id="addBGInput" placeholder="Add custom background">
@@ -155,41 +161,18 @@
 </div>
 
 <script>
-    // Icon Mapping (Font Awesome classes)
     const iconMap = {
-        // Classes
-        "Barbarian": "fa-solid fa-hand-fist",
-        "Bard": "fa-solid fa-guitar",
-        "Cleric": "fa-solid fa-ankh",
-        "Druid": "fa-solid fa-leaf",
-        "Fighter": "fa-solid fa-shield-halved",
-        "Monk": "fa-solid fa-shoe-prints",
-        "Paladin": "fa-solid fa-sun",
-        "Ranger": "fa-solid fa-bow-arrow",
-        "Rogue": "fa-solid fa-user-ninja",
-        "Sorcerer": "fa-solid fa-wand-magic-sparkles",
-        "Warlock": "fa-solid fa-eye",
-        "Wizard": "fa-solid fa-hat-wizard",
-        "Artificer": "fa-solid fa-gears",
-        "Blood Hunter": "fa-solid fa-droplet",
-        // Races
-        "Elf": "fa-solid fa-clover",
-        "Tiefling": "fa-solid fa-fire",
-        "Drow": "fa-solid fa-moon",
-        "Human": "fa-solid fa-person",
-        "Githyanki": "fa-solid fa-dragon",
-        "Dwarf": "fa-solid fa-mountain",
-        "Half-Elf": "fa-solid fa-dna",
-        "Halfling": "fa-solid fa-wheat-awn",
-        "Gnome": "fa-solid fa-flask",
-        "Dragonborn": "fa-solid fa-republican", // Looks like a lizard/dragon
-        "Half-Orc": "fa-solid fa-skull",
-        // Backgrounds
-        "Acolyte": "fa-solid fa-scroll",
-        "Charlatan": "fa-solid fa-masks-theater",
-        "Criminal": "fa-solid fa-sack-dollar",
-        "Soldier": "fa-solid fa-medal",
-        "Noble": "fa-solid fa-crown"
+        "Male": "fa-solid fa-mars", "Female": "fa-solid fa-venus", "Trans-Male": "fa-solid fa-mars-double", 
+        "Trans-Female": "fa-solid fa-venus-double", "Non-Binary": "fa-solid fa-genderless",
+        "Barbarian": "fa-solid fa-hand-fist", "Bard": "fa-solid fa-guitar", "Cleric": "fa-solid fa-ankh",
+        "Druid": "fa-solid fa-leaf", "Fighter": "fa-solid fa-shield-halved", "Monk": "fa-solid fa-shoe-prints",
+        "Paladin": "fa-solid fa-sun", "Ranger": "fa-solid fa-bow-arrow", "Rogue": "fa-solid fa-user-ninja",
+        "Sorcerer": "fa-solid fa-wand-magic-sparkles", "Warlock": "fa-solid fa-eye", "Wizard": "fa-solid fa-hat-wizard",
+        "Artificer": "fa-solid fa-gears", "Blood Hunter": "fa-solid fa-droplet",
+        "Elf": "fa-solid fa-clover", "Tiefling": "fa-solid fa-fire", "Drow": "fa-solid fa-moon",
+        "Human": "fa-solid fa-person", "Githyanki": "fa-solid fa-dragon", "Dwarf": "fa-solid fa-mountain",
+        "Half-Elf": "fa-solid fa-dna", "Halfling": "fa-solid fa-wheat-awn", "Gnome": "fa-solid fa-flask",
+        "Dragonborn": "fa-solid fa-dragon-li", "Half-Orc": "fa-solid fa-skull"
     };
 
     const classColors = {
@@ -199,6 +182,7 @@
         "Artificer": "#b15f32", "Blood Hunter": "#731212"
     };
 
+    const genderData = ["Male", "Female", "Trans-Male", "Trans-Female", "Non-Binary"];
     const defaultRaces = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -206,7 +190,6 @@
         "Halfling": ["Lightfoot", "Strongheart"], "Gnome": ["Rock Gnome", "Forest Gnome", "Deep Gnome"],
         "Dragonborn": ["Black", "Blue", "Brass", "Bronze", "Copper", "Gold", "Green", "Red", "Silver", "White"], "Half-Orc": ["Standard"]
     };
-
     const defaultClasses = {
         "Barbarian": ["Wildheart", "Berserker", "Wild Magic", "Giant"], "Bard": ["Lore", "Valor", "Swords", "Glamour"],
         "Cleric": ["Life", "Light", "Trickery", "Knowledge", "Nature", "Tempest", "War", "Death"], "Druid": ["Moon", "Land", "Spores", "Stars"],
@@ -215,7 +198,6 @@
         "Rogue": ["Thief", "Arcane Trickster", "Assassin", "Swashbuckler"], "Sorcerer": ["Draconic", "Wild Magic", "Storm", "Shadow"],
         "Warlock": ["Fiend", "Great Old One", "Archfey", "Hexblade"], "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation", "Bladesinging"]
     };
-
     const defaultBGs = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Noble", "Outlander", "Sage", "Soldier", "Urchin"];
 
     let raceData = JSON.parse(JSON.stringify(defaultRaces));
@@ -230,17 +212,15 @@
 
     let currentRotation = 0;
     let rollState = "START"; 
-    let sessionResult = { race: "", subrace: "", class: "", subclass: "", background: "" };
+    let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
 
-    function getIcon(name) {
-        return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`;
-    }
+    function getIcon(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
 
     function populate(data, id) {
         const container = document.getElementById(id);
         const keys = Array.isArray(data) ? data : Object.keys(data);
         container.innerHTML = "";
-        keys.sort().forEach(k => {
+        keys.forEach(k => {
             const lbl = document.createElement('label');
             lbl.className = 'checkbox-label';
             lbl.innerHTML = `<input type="checkbox" value="${k}" checked onchange="refreshWheel()"> ${getIcon(k)} ${k}`;
@@ -248,17 +228,15 @@
         });
     }
 
-    function injectModPack(type) {
-        if (type === 'races') {
-            ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; });
-            populate(raceData, 'raceCheckboxes');
-        } else {
-            const mods = { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] };
-            Object.assign(classData, mods);
-            populate(classData, 'classCheckboxes');
-        }
+    function syncUI() {
+        document.getElementById('cardGender').classList.toggle('disabled', !document.getElementById('spinGender').checked);
+        document.getElementById('cardRace').classList.toggle('disabled', !document.getElementById('spinRace').checked);
+        document.getElementById('cardClass').classList.toggle('disabled', !document.getElementById('spinClass').checked);
+        document.getElementById('cardBG').classList.toggle('disabled', !document.getElementById('spinBG').checked);
         refreshWheel();
     }
+
+    function getActive(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value); }
 
     function drawWheel(options) {
         const n = options.length;
@@ -290,21 +268,24 @@
     function nextStep() {
         mainBtn.disabled = false;
         if (rollState === "START") {
-            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; drawWheel(getActive('raceCheckboxes')); } 
-            else { sessionResult.race = "Custom"; rollState = "CLASS_PENDING"; nextStep(); }
+            if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); }
+            else { sessionResult.gender = "Chosen"; rollState = "RACE_PENDING"; nextStep(); }
+        } else if (rollState === "RACE_PENDING") {
+            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); }
+            else { sessionResult.race = "Chosen"; rollState = "CLASS_PENDING"; nextStep(); }
         } else if (rollState === "CLASS_PENDING") {
-            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); } 
-            else { sessionResult.class = "Custom"; rollState = "BG_PENDING"; nextStep(); }
+            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); }
+            else { sessionResult.class = "Chosen"; rollState = "BG_PENDING"; nextStep(); }
         } else if (rollState === "BG_PENDING") {
-            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); } 
-            else { sessionResult.background = "Custom"; finalize(); }
+            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); }
+            else { sessionResult.background = "Chosen"; finalize(); }
         }
     }
 
     function finalize() {
         const r = sessionResult;
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
-        const total = `${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
+        const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         resultBanner.innerHTML = `${getIcon(r.class)} ${total}`;
         mainBtn.classList.add('hidden'); resetBtn.classList.remove('hidden');
     }
@@ -314,16 +295,16 @@
         setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; cb(); }, 50);
     }
 
-    function syncUI() { refreshWheel(); }
-    function getActive(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value); }
-    function refreshWheel() { 
-        if (rollState === "RACE" || rollState === "START") drawWheel(getActive('raceCheckboxes'));
+    function refreshWheel() {
+        if (rollState === "GENDER" || rollState === "START") drawWheel(getActive('genderCheckboxes'));
+        else if (rollState === "RACE") drawWheel(getActive('raceCheckboxes'));
         else if (rollState === "CLASS") drawWheel(getActive('classCheckboxes'));
         else if (rollState === "BACKGROUND") drawWheel(getActive('bgCheckboxes'));
     }
 
     mainBtn.onclick = () => {
         if (rollState === "START") nextStep();
+        else if (rollState === "GENDER") { spin(getActive('genderCheckboxes'), (win) => { sessionResult.gender = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`; rollState = "RACE_PENDING"; nextStep(); }); }
         else if (rollState === "RACE") {
             spin(getActive('raceCheckboxes'), (win) => {
                 sessionResult.race = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`;
@@ -333,22 +314,30 @@
                 } else { rollState = "CLASS_PENDING"; nextStep(); }
             });
         }
-        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerHTML = `${getIcon(sessionResult.race)} ${win} ${sessionResult.race}`; rollState = "CLASS_PENDING"; nextStep(); }); }
+        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerHTML = `${win} ${sessionResult.race}`; rollState = "CLASS_PENDING"; nextStep(); }); }
         else if (rollState === "CLASS") {
             spin(getActive('classCheckboxes'), (win) => {
                 sessionResult.class = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`;
                 rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win]));
             });
         }
-        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${getIcon(sessionResult.class)} ${sessionResult.class} (${win})`; rollState = "BG_PENDING"; nextStep(); }); }
+        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${sessionResult.class} (${win})`; rollState = "BG_PENDING"; nextStep(); }); }
         else if (rollState === "BACKGROUND") { spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); }); }
     };
 
-    function triggerTotalWipe() {
-        location.reload(); // Simplest clean reset
+    function triggerTotalWipe() { location.reload(); }
+    function injectModPack(type) {
+        if (type === 'races') { ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; }); populate(raceData, 'raceCheckboxes'); }
+        else { Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] }); populate(classData, 'classCheckboxes'); }
+        refreshWheel();
+    }
+    function addCustomOption(containerId, inputId, dataSource) {
+        const input = document.getElementById(inputId); const val = input.value.trim(); if (!val) return;
+        if (Array.isArray(dataSource)) { if (!dataSource.includes(val)) dataSource.push(val); } else { if (!dataSource[val]) dataSource[val] = ["Standard"]; }
+        populate(dataSource, containerId); input.value = ""; refreshWheel();
     }
 
-    window.onload = () => { populate(raceData, 'raceCheckboxes'); populate(classData, 'classCheckboxes'); populate(backgrounds, 'bgCheckboxes'); refreshWheel(); };
+    window.onload = () => { populate(genderData, 'genderCheckboxes'); populate(raceData, 'raceCheckboxes'); populate(classData, 'classCheckboxes'); populate(backgrounds, 'bgCheckboxes'); refreshWheel(); };
 </script>
 </body>
 </html>
