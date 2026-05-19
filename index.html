@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BG3 Modular Character Spinner</title>
+    <title>BG3 Ultimate Moddable Spinner</title>
     <style>
         :root {
             --bg-color: #0f0f12;
@@ -12,6 +12,7 @@
             --text-color: #f5f5f7;
             --text-muted: #a0a0a5;
             --gold: #c3a34a;
+            --success: #28a745;
         }
 
         body {
@@ -22,7 +23,6 @@
 
         .container { max-width: 650px; width: 100%; text-align: center; position: relative; }
         
-        /* Global Reset Icon */
         .global-reset {
             position: absolute; top: 5px; right: 10px;
             background: none; border: 1px solid #444; color: var(--text-muted);
@@ -56,12 +56,23 @@
 
         canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
 
-        .card { background-color: var(--card-color); border: 1px solid #333; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; transition: opacity 0.3s; }
+        .card { background-color: var(--card-color); border: 1px solid #333; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; }
         .card h3 { margin-top: 0; font-size: 0.75rem; color: var(--gold); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 8px; }
         .card.disabled { opacity: 0.3; pointer-events: none; }
 
-        .controls { margin-bottom: 6px; }
-        .toggle-btn { background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.7rem; text-decoration: underline; margin-right: 8px; }
+        .controls { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .toggle-btn { background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.7rem; text-decoration: underline; }
+
+        /* Add Custom Option UI */
+        .add-custom { display: flex; gap: 5px; width: 100%; margin-top: 8px; }
+        .add-custom input { 
+            flex-grow: 1; background: #0f0f12; border: 1px solid #444; color: white; 
+            padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;
+        }
+        .add-custom button { 
+            background: var(--gold); border: none; color: black; font-weight: bold; 
+            padding: 0 10px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+        }
 
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 4px; }
         .checkbox-label { font-size: 0.7rem; background: #25252a; padding: 5px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; }
@@ -77,7 +88,7 @@
         .reset-btn { background: #333; border: 1px solid #555; font-size: 0.85rem; padding: 10px; margin-top: 10px; }
         .hidden { display: none !important; }
 
-        #result-banner { font-size: 1.1rem; color: var(--gold); margin: 10px 0; font-weight: bold; min-height: 2.5rem; text-transform: uppercase; }
+        #result-banner { font-size: 1.1rem; color: var(--gold); margin: 10px 0; font-weight: bold; min-height: 2.5rem; text-transform: uppercase; line-height: 1.2; }
         #history-list { list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 0.8rem; }
         #history-list li { padding: 6px 0; border-bottom: 1px solid #333; line-height: 1.3; }
         #history-list li span { color: var(--gold); font-weight: bold; }
@@ -102,28 +113,46 @@
     <div class="card" id="cardRace">
         <h3>1. Race Filters</h3>
         <div class="controls">
-            <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', true)">All</button>
-            <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', false)">None</button>
+            <div>
+                <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', true)">All</button>
+                <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', false)">None</button>
+            </div>
         </div>
         <div id="raceCheckboxes" class="checkbox-grid"></div>
+        <div class="add-custom">
+            <input type="text" id="addRaceInput" placeholder="Add custom race (e.g. Aasimar)">
+            <button onclick="addCustomOption('raceCheckboxes', 'addRaceInput', raceData)">+</button>
+        </div>
     </div>
 
     <div class="card" id="cardClass">
         <h3>2. Class Filters</h3>
         <div class="controls">
-            <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', true)">All</button>
-            <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', false)">None</button>
+            <div>
+                <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', true)">All</button>
+                <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', false)">None</button>
+            </div>
         </div>
         <div id="classCheckboxes" class="checkbox-grid"></div>
+        <div class="add-custom">
+            <input type="text" id="addClassInput" placeholder="Add custom class (e.g. Artificer)">
+            <button onclick="addCustomOption('classCheckboxes', 'addClassInput', classData)">+</button>
+        </div>
     </div>
 
     <div class="card" id="cardBG">
         <h3>3. Background Filters</h3>
         <div class="controls">
-            <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', true)">All</button>
-            <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', false)">None</button>
+            <div>
+                <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', true)">All</button>
+                <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', false)">None</button>
+            </div>
         </div>
         <div id="bgCheckboxes" class="checkbox-grid"></div>
+        <div class="add-custom">
+            <input type="text" id="addBGInput" placeholder="Add custom background">
+            <button onclick="addCustomOption('bgCheckboxes', 'addBGInput', backgrounds)">+</button>
+        </div>
     </div>
 
     <div class="wheel-wrapper">
@@ -176,12 +205,31 @@
     function populate(data, id) {
         const container = document.getElementById(id);
         const keys = Array.isArray(data) ? data : Object.keys(data);
+        container.innerHTML = ""; // Clear existing
         keys.forEach(k => {
             const lbl = document.createElement('label');
             lbl.className = 'checkbox-label';
             lbl.innerHTML = `<input type="checkbox" value="${k}" checked onchange="refreshWheel()"> ${k}`;
             container.appendChild(lbl);
         });
+    }
+
+    function addCustomOption(containerId, inputId, dataSource) {
+        const input = document.getElementById(inputId);
+        const val = input.value.trim();
+        if (!val) return;
+
+        // Add to the internal data structure
+        if (Array.isArray(dataSource)) {
+            if (!dataSource.includes(val)) dataSource.push(val);
+        } else {
+            if (!dataSource[val]) dataSource[val] = ["Standard"];
+        }
+
+        // Refresh the checkbox list
+        populate(dataSource, containerId);
+        input.value = "";
+        refreshWheel();
     }
 
     populate(raceData, 'raceCheckboxes');
@@ -216,7 +264,7 @@
             ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
             ctx.save(); ctx.translate(250,250); ctx.rotate(i*arc + arc/2);
             ctx.textAlign = "right"; ctx.fillStyle = "#f5f5f7";
-            ctx.font = `bold ${n > 15 ? '12' : '15'}px sans-serif`; 
+            ctx.font = `bold ${n > 15 ? '11' : '15'}px sans-serif`; 
             ctx.fillText(opt, 230, 6); ctx.restore();
         });
     }
@@ -255,26 +303,19 @@
             if (document.getElementById('spinRace').checked) {
                 rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE";
                 hardResetWheel(() => drawWheel(getActive('raceCheckboxes')));
-            } else {
-                sessionResult.race = "Custom"; rollState = "CLASS_PENDING"; nextStep();
-            }
+            } else { sessionResult.race = "Custom"; sessionResult.subrace = ""; rollState = "CLASS_PENDING"; nextStep(); }
         } 
         else if (rollState === "CLASS_PENDING") {
             if (document.getElementById('spinClass').checked) {
                 rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS";
                 hardResetWheel(() => drawWheel(getActive('classCheckboxes')));
-            } else {
-                sessionResult.class = "Custom"; sessionResult.subclass = "Custom";
-                rollState = "BG_PENDING"; nextStep();
-            }
+            } else { sessionResult.class = "Custom"; sessionResult.subclass = "Custom"; rollState = "BG_PENDING"; nextStep(); }
         }
         else if (rollState === "BG_PENDING") {
             if (document.getElementById('spinBG').checked) {
                 rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND";
                 hardResetWheel(() => drawWheel(getActive('bgCheckboxes')));
-            } else {
-                sessionResult.background = "Custom"; finalize();
-            }
+            } else { sessionResult.background = "Custom"; finalize(); }
         }
     }
 
