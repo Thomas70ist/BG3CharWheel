@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BG3 Ultimate Moddable Spinner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --bg-color: #0f0f12;
@@ -12,13 +14,15 @@
             --text-color: #f5f5f7;
             --text-muted: #a0a0a5;
             --gold: #c3a34a;
-            --success: #28a745;
+            --font-header: 'Cinzel', serif;
+            --font-body: 'Cormorant Garamond', serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-body);
             background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center;
+            font-size: 1.1rem;
         }
 
         .container { max-width: 650px; width: 100%; text-align: center; position: relative; }
@@ -28,70 +32,85 @@
             background: none; border: 1px solid #444; color: var(--text-muted);
             border-radius: 50%; width: 30px; height: 30px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; transition: 0.2s; z-index: 1000;
+            font-size: 1rem; transition: 0.2s; z-index: 1000;
         }
         .global-reset:hover { border-color: var(--accent-color); color: var(--accent-color); transform: rotate(-90deg); }
 
-        h1 { margin-bottom: 5px; color: var(--gold); letter-spacing: 2px; font-size: 1.5rem; }
-        .subtitle { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px; }
+        h1 { 
+            font-family: var(--font-header);
+            margin-bottom: 5px; color: var(--gold); 
+            letter-spacing: 3px; font-size: 1.8rem; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .subtitle { font-family: var(--font-header); color: var(--text-muted); font-size: 0.7rem; margin-bottom: 15px; letter-spacing: 1px; }
 
         .step-selector {
-            display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;
-            background: #25252a; padding: 10px; border-radius: 8px; border: 1px solid var(--gold);
+            display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;
+            background: #25252a; padding: 12px; border-radius: 4px; border: 1px solid var(--gold);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .step-toggle { font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .step-toggle { font-family: var(--font-header); font-size: 0.75rem; display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--gold); }
         .step-toggle input { accent-color: var(--gold); }
 
         .wheel-wrapper {
-            position: relative; width: 300px; height: 300px;
-            margin: 15px auto; border: 6px solid var(--gold);
-            border-radius: 50%; box-shadow: 0 0 30px rgba(0,0,0,0.8); background: #1a1a1e;
+            position: relative; width: 320px; height: 320px;
+            margin: 20px auto; border: 4px solid var(--gold);
+            border-radius: 50%; box-shadow: 0 0 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(195, 163, 74, 0.2); 
+            background: #1a1a1e;
         }
 
         .pointer {
-            position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 12px solid transparent;
-            border-right: 12px solid transparent; border-top: 25px solid var(--gold); z-index: 100;
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent;
+            border-right: 15px solid transparent; border-top: 30px solid var(--gold); z-index: 100;
+            filter: drop-shadow(0 2px 5px black);
         }
 
         canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
 
-        .card { background-color: var(--card-color); border: 1px solid #333; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; }
-        .card h3 { margin-top: 0; font-size: 0.75rem; color: var(--gold); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 8px; }
-        .card.disabled { opacity: 0.3; pointer-events: none; }
+        .card { background-color: var(--card-color); border: 1px solid #3e3e42; border-radius: 4px; padding: 15px; margin-bottom: 12px; text-align: left; }
+        .card h3 { 
+            font-family: var(--font-header);
+            margin-top: 0; font-size: 0.8rem; color: var(--gold); 
+            border-bottom: 1px solid #444; padding-bottom: 6px; margin-bottom: 10px; 
+        }
+        .card.disabled { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
 
-        .controls { margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; }
-        .toggle-btn { background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.7rem; text-decoration: underline; }
-
-        /* Add Custom Option UI */
-        .add-custom { display: flex; gap: 5px; width: 100%; margin-top: 8px; }
+        .add-custom { display: flex; gap: 8px; width: 100%; margin-top: 12px; }
         .add-custom input { 
-            flex-grow: 1; background: #0f0f12; border: 1px solid #444; color: white; 
-            padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;
+            flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; 
+            padding: 6px 10px; border-radius: 2px; font-family: var(--font-body);
         }
         .add-custom button { 
             background: var(--gold); border: none; color: black; font-weight: bold; 
-            padding: 0 10px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+            padding: 0 15px; border-radius: 2px; cursor: pointer; font-family: var(--font-header);
         }
 
-        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 4px; }
-        .checkbox-label { font-size: 0.7rem; background: #25252a; padding: 5px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; }
-        .checkbox-label input { margin-right: 4px; accent-color: var(--accent-color); }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+        .checkbox-label { font-size: 0.9rem; background: #2a2a2f; padding: 6px; border-radius: 2px; border: 1px solid #333; cursor: pointer; }
+        .checkbox-label:hover { border-color: var(--gold); }
+        .checkbox-label input { margin-right: 6px; accent-color: var(--accent-color); }
 
         .btn {
+            font-family: var(--font-header);
             background: linear-gradient(to bottom, #da1f3d, #8b1426);
-            color: white; border: 1px solid var(--gold); padding: 12px;
-            width: 100%; font-size: 1rem; cursor: pointer; font-weight: bold; border-radius: 6px; margin-top: 8px;
+            color: white; border: 1px solid var(--gold); padding: 15px;
+            width: 100%; font-size: 1.1rem; cursor: pointer; letter-spacing: 2px;
+            border-radius: 2px; margin-top: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         .btn:disabled { opacity: 0.4; cursor: wait; }
-        .reset-btn { background: #333; border: 1px solid #555; font-size: 0.85rem; padding: 10px; margin-top: 10px; }
+        .reset-btn { background: #222; border: 1px solid #444; color: var(--gold); }
         .hidden { display: none !important; }
 
-        #result-banner { font-size: 1.1rem; color: var(--gold); margin: 10px 0; font-weight: bold; min-height: 2.5rem; text-transform: uppercase; line-height: 1.2; }
-        #history-list { list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 0.8rem; }
-        #history-list li { padding: 6px 0; border-bottom: 1px solid #333; line-height: 1.3; }
-        #history-list li span { color: var(--gold); font-weight: bold; }
+        #result-banner { 
+            font-family: var(--font-header); font-size: 1.3rem; color: var(--gold); 
+            margin: 15px 0; min-height: 3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        
+        #history-list { list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; }
+        #history-list li { padding: 8px 0; border-bottom: 1px solid #333; font-size: 0.95rem; color: #ccc; }
+        #history-list li span { color: var(--gold); font-weight: bold; font-family: var(--font-header); font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -99,10 +118,11 @@
 <div class="container">
     <button class="global-reset" onclick="triggerFullReset()" title="Reset All">⟳</button>
     
-    <h1>BG3 ADVENTURE ROLLER</h1>
+    <h1>ADVENTURE ROLLER</h1>
+    <div class="subtitle">Gather Your Party</div>
     
     <div class="card">
-        <h3>Enable/Disable Spin Phases</h3>
+        <h3>Campaign Settings</h3>
         <div class="step-selector">
             <label class="step-toggle"><input type="checkbox" id="spinRace" checked onchange="syncUI()"> Race</label>
             <label class="step-toggle"><input type="checkbox" id="spinClass" checked onchange="syncUI()"> Class</label>
@@ -111,46 +131,28 @@
     </div>
 
     <div class="card" id="cardRace">
-        <h3>1. Race Filters</h3>
-        <div class="controls">
-            <div>
-                <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', true)">All</button>
-                <button class="toggle-btn" onclick="bulkToggle('raceCheckboxes', false)">None</button>
-            </div>
-        </div>
+        <h3>I. Race Filters</h3>
         <div id="raceCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addRaceInput" placeholder="Add custom race (e.g. Aasimar)">
+            <input type="text" id="addRaceInput" placeholder="Add custom race...">
             <button onclick="addCustomOption('raceCheckboxes', 'addRaceInput', raceData)">+</button>
         </div>
     </div>
 
     <div class="card" id="cardClass">
-        <h3>2. Class Filters</h3>
-        <div class="controls">
-            <div>
-                <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', true)">All</button>
-                <button class="toggle-btn" onclick="bulkToggle('classCheckboxes', false)">None</button>
-            </div>
-        </div>
+        <h3>II. Class Filters</h3>
         <div id="classCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addClassInput" placeholder="Add custom class (e.g. Artificer)">
+            <input type="text" id="addClassInput" placeholder="Add custom class...">
             <button onclick="addCustomOption('classCheckboxes', 'addClassInput', classData)">+</button>
         </div>
     </div>
 
     <div class="card" id="cardBG">
-        <h3>3. Background Filters</h3>
-        <div class="controls">
-            <div>
-                <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', true)">All</button>
-                <button class="toggle-btn" onclick="bulkToggle('bgCheckboxes', false)">None</button>
-            </div>
-        </div>
+        <h3>III. Background Filters</h3>
         <div id="bgCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addBGInput" placeholder="Add custom background">
+            <input type="text" id="addBGInput" placeholder="Add custom background...">
             <button onclick="addCustomOption('bgCheckboxes', 'addBGInput', backgrounds)">+</button>
         </div>
     </div>
@@ -160,18 +162,19 @@
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
     </div>
 
-    <div id="result-banner">Ready to start?</div>
+    <div id="result-banner">Fate awaits...</div>
     
     <button class="btn" id="mainBtn">BEGIN JOURNEY</button>
-    <button class="btn reset-btn hidden" id="resetBtn">START NEW CHARACTER</button>
+    <button class="btn reset-btn hidden" id="resetBtn">NEW CHARACTER</button>
 
-    <div class="card" style="margin-top: 15px;">
-        <h3>Roll History</h3>
-        <ul id="history-list"><li style="color: var(--text-muted);">No rolls yet...</li></ul>
+    <div class="card" style="margin-top: 20px;">
+        <h3>Chronicles of Fate</h3>
+        <ul id="history-list"><li style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li></ul>
     </div>
 </div>
 
 <script>
+    /* Data remains identical to previous version */
     const raceData = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -205,7 +208,7 @@
     function populate(data, id) {
         const container = document.getElementById(id);
         const keys = Array.isArray(data) ? data : Object.keys(data);
-        container.innerHTML = ""; // Clear existing
+        container.innerHTML = "";
         keys.forEach(k => {
             const lbl = document.createElement('label');
             lbl.className = 'checkbox-label';
@@ -218,33 +221,17 @@
         const input = document.getElementById(inputId);
         const val = input.value.trim();
         if (!val) return;
-
-        // Add to the internal data structure
-        if (Array.isArray(dataSource)) {
-            if (!dataSource.includes(val)) dataSource.push(val);
-        } else {
-            if (!dataSource[val]) dataSource[val] = ["Standard"];
-        }
-
-        // Refresh the checkbox list
+        if (Array.isArray(dataSource)) { if (!dataSource.includes(val)) dataSource.push(val); } 
+        else { if (!dataSource[val]) dataSource[val] = ["Standard"]; }
         populate(dataSource, containerId);
         input.value = "";
         refreshWheel();
     }
 
-    populate(raceData, 'raceCheckboxes');
-    populate(classData, 'classCheckboxes');
-    populate(backgrounds, 'bgCheckboxes');
-
     function syncUI() {
         document.getElementById('cardRace').classList.toggle('disabled', !document.getElementById('spinRace').checked);
         document.getElementById('cardClass').classList.toggle('disabled', !document.getElementById('spinClass').checked);
         document.getElementById('cardBG').classList.toggle('disabled', !document.getElementById('spinBG').checked);
-        refreshWheel();
-    }
-
-    function bulkToggle(id, state) {
-        document.querySelectorAll(`#${id} input`).forEach(i => i.checked = state);
         refreshWheel();
     }
 
@@ -258,14 +245,15 @@
         const arc = (Math.PI*2)/n;
         ctx.clearRect(0,0,500,500);
         options.forEach((opt, i) => {
-            ctx.fillStyle = i % 2 === 0 ? "#1a1a1e" : "#2a2a30";
+            ctx.fillStyle = i % 2 === 0 ? "#121216" : "#1d1d22";
             ctx.beginPath(); ctx.moveTo(250,250);
             ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
-            ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 1.5; ctx.stroke();
             ctx.save(); ctx.translate(250,250); ctx.rotate(i*arc + arc/2);
-            ctx.textAlign = "right"; ctx.fillStyle = "#f5f5f7";
-            ctx.font = `bold ${n > 15 ? '11' : '15'}px sans-serif`; 
-            ctx.fillText(opt, 230, 6); ctx.restore();
+            ctx.textAlign = "right"; ctx.fillStyle = "#c3a34a";
+            // Updated Font for Slices
+            ctx.font = `bold ${n > 15 ? '10' : '14'}px 'Cinzel'`; 
+            ctx.fillText(opt.toUpperCase(), 235, 5); ctx.restore();
         });
     }
 
@@ -303,15 +291,13 @@
             if (document.getElementById('spinRace').checked) {
                 rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE";
                 hardResetWheel(() => drawWheel(getActive('raceCheckboxes')));
-            } else { sessionResult.race = "Custom"; sessionResult.subrace = ""; rollState = "CLASS_PENDING"; nextStep(); }
-        } 
-        else if (rollState === "CLASS_PENDING") {
+            } else { sessionResult.race = "Custom"; rollState = "CLASS_PENDING"; nextStep(); }
+        } else if (rollState === "CLASS_PENDING") {
             if (document.getElementById('spinClass').checked) {
                 rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS";
                 hardResetWheel(() => drawWheel(getActive('classCheckboxes')));
             } else { sessionResult.class = "Custom"; sessionResult.subclass = "Custom"; rollState = "BG_PENDING"; nextStep(); }
-        }
-        else if (rollState === "BG_PENDING") {
+        } else if (rollState === "BG_PENDING") {
             if (document.getElementById('spinBG').checked) {
                 rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND";
                 hardResetWheel(() => drawWheel(getActive('bgCheckboxes')));
@@ -322,10 +308,11 @@
     function finalize() {
         const r = sessionResult;
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
-        const total = `[${r.background}] ${raceFinal} | ${r.class} (${r.subclass})`;
+        const total = `${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         resultBanner.innerText = total;
-        if (historyList.innerHTML.includes("No rolls yet")) historyList.innerHTML = "";
-        const li = document.createElement('li'); li.innerHTML = `<span>${total}</span>`;
+        if (historyList.innerHTML.includes("ink has not yet dried")) historyList.innerHTML = "";
+        const li = document.createElement('li'); 
+        li.innerHTML = `<span>ENTRY #${historyList.children.length + 1}</span><br>${total}`;
         historyList.prepend(li);
         mainBtn.classList.add('hidden'); resetBtn.classList.remove('hidden');
     }
@@ -367,11 +354,14 @@
     function triggerFullReset() {
         rollState = "START"; mainBtn.innerText = "BEGIN JOURNEY";
         mainBtn.classList.remove('hidden'); mainBtn.disabled = false;
-        resetBtn.classList.add('hidden'); resultBanner.innerText = "Ready to start?";
+        resetBtn.classList.add('hidden'); resultBanner.innerText = "Fate awaits...";
         sessionResult = { race: "", subrace: "", class: "", subclass: "", background: "" };
         hardResetWheel(() => refreshWheel());
     }
 
+    populate(raceData, 'raceCheckboxes');
+    populate(classData, 'classCheckboxes');
+    populate(backgrounds, 'bgCheckboxes');
     resetBtn.onclick = triggerFullReset;
     window.onload = refreshWheel;
 </script>
