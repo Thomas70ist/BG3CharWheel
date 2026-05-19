@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BG3 Character Spinner</title>
+    <title>BG3 Ultimate Character Spinner</title>
     <style>
         :root {
             --bg-color: #0f0f12;
@@ -26,8 +26,7 @@
         }
 
         .container { max-width: 600px; width: 100%; text-align: center; }
-        
-        h1 { margin-bottom: 5px; color: var(--gold); }
+        h1 { margin-bottom: 5px; color: var(--gold); letter-spacing: 2px; }
         .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
 
         .wheel-wrapper {
@@ -41,7 +40,6 @@
             background: #1a1a1e;
         }
 
-        /* The Pointer is at the TOP (12 o'clock) */
         .pointer {
             position: absolute;
             top: -20px;
@@ -53,14 +51,12 @@
             border-right: 15px solid transparent;
             border-top: 30px solid var(--gold);
             z-index: 100;
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
         }
 
         canvas {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            /* Smooth deceleration curve */
             transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
         }
 
@@ -68,67 +64,62 @@
             background-color: var(--card-color);
             border: 1px solid #333;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
             text-align: left;
         }
 
-        .card h3 { margin-top: 0; font-size: 0.9rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+        .card h3 { margin-top: 0; font-size: 0.8rem; color: var(--gold); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 10px; }
 
-        .controls { margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .controls { margin-bottom: 8px; }
         .toggle-btn {
             background: none;
             border: none;
             color: var(--accent-color);
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-decoration: underline;
-            padding: 0;
-            margin-right: 15px;
+            margin-right: 10px;
         }
 
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 5px;
         }
 
         .checkbox-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             background: #25252a;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 6px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            transition: background 0.2s;
         }
-        .checkbox-label:hover { background: #2f2f36; }
-        .checkbox-label input { margin-right: 8px; accent-color: var(--accent-color); }
+        .checkbox-label input { margin-right: 5px; accent-color: var(--accent-color); }
 
         .btn {
             background: linear-gradient(to bottom, #da1f3d, #8b1426);
             color: white;
             border: 1px solid var(--gold);
-            padding: 18px;
+            padding: 15px;
             width: 100%;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
             border-radius: 8px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            box-shadow: 0 4px 15px rgba(218, 31, 61, 0.2);
+            margin-top: 10px;
         }
 
-        .btn:active { transform: translateY(2px); box-shadow: none; }
         .btn:disabled { opacity: 0.4; cursor: wait; }
 
         #result-banner {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--gold);
-            margin: 20px 0;
+            margin: 15px 0;
             font-weight: bold;
-            min-height: 2.2rem;
+            min-height: 2rem;
             text-transform: uppercase;
         }
 
@@ -136,14 +127,11 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
+            font-size: 0.85rem;
         }
-        #history-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid #333;
-            font-size: 0.95rem;
-        }
+        #history-list li { padding: 5px 0; border-bottom: 1px solid #333; }
         #history-list li span { color: var(--gold); font-weight: bold; }
 
         .hidden { display: none; }
@@ -153,15 +141,24 @@
 
 <div class="container">
     <h1>BG3 ADVENTURE ROLLER</h1>
-    <div class="subtitle">Destiny awaits your click...</div>
+    <div class="subtitle">From Race to Subclass, let the dice decide</div>
     
+    <div class="card">
+        <h3>Race Filters</h3>
+        <div class="controls">
+            <button class="toggle-btn" onclick="toggleSet('race', true)">Select All</button>
+            <button class="toggle-btn" onclick="toggleSet('race', false)">Clear All</button>
+        </div>
+        <div class="checkbox-grid" id="raceCheckboxes"></div>
+    </div>
+
     <div class="card">
         <h3>Class Filters</h3>
         <div class="controls">
-            <button class="toggle-btn" id="allOn">Select All</button>
-            <button class="toggle-btn" id="allOff">Clear All</button>
+            <button class="toggle-btn" onclick="toggleSet('class', true)">Select All</button>
+            <button class="toggle-btn" onclick="toggleSet('class', false)">Clear All</button>
         </div>
-        <div class="checkbox-grid" id="checkboxContainer"></div>
+        <div class="checkbox-grid" id="classCheckboxes"></div>
     </div>
 
     <div class="wheel-wrapper">
@@ -169,10 +166,9 @@
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
     </div>
 
-    <div id="result-banner">Gather your party...</div>
+    <div id="result-banner">Click to start your journey</div>
     
-    <button class="btn" id="spinBtn">SPIN FOR CLASS</button>
-    <button class="btn hidden" id="subclassBtn">SPIN FOR SUBCLASS</button>
+    <button class="btn" id="mainBtn">SPIN FOR RACE</button>
 
     <div class="card" style="margin-top: 20px;">
         <h3>Roll History</h3>
@@ -183,162 +179,182 @@
 </div>
 
 <script>
-    const bg3Data = {
-        "Barbarian": ["Wildheart", "Berserker", "Wild Magic"],
-        "Bard": ["Lore", "Valor", "Swords"],
-        "Cleric": ["Life", "Light", "Trickery", "Knowledge", "Nature", "Tempest", "War"],
-        "Druid": ["Moon", "Land", "Spores"],
-        "Fighter": ["Battle Master", "Champion", "Eldritch Knight"],
-        "Monk": ["Open Hand", "Shadow", "Elements"],
-        "Paladin": ["Devotion", "Ancients", "Vengeance", "Oathbreaker"],
-        "Ranger": ["Hunter", "Beast Master", "Gloom Stalker"],
-        "Rogue": ["Thief", "Arcane Trickster", "Assassin"],
-        "Sorcerer": ["Draconic", "Wild Magic", "Storm"],
-        "Warlock": ["Fiend", "Great Old One", "Archfey"],
-        "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation"]
+    const raceData = {
+        "Elf": ["High Elf", "Wood Elf"],
+        "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
+        "Drow": ["Lolth-Sworn", "Seldarine"],
+        "Human": ["Standard"],
+        "Githyanki": ["Standard"],
+        "Dwarf": ["Gold Dwarf", "Shield Dwarf", "Duergar"],
+        "Half-Elf": ["High Half-Elf", "Wood Half-Elf", "Drow Half-Elf"],
+        "Halfling": ["Lightfoot", "Strongheart"],
+        "Gnome": ["Rock Gnome", "Forest Gnome", "Deep Gnome"],
+        "Dragonborn": ["Black", "Blue", "Brass", "Bronze", "Copper", "Gold", "Green", "Red", "Silver", "White"],
+        "Half-Orc": ["Standard"]
+    };
+
+    const classData = {
+        "Barbarian": ["Wildheart", "Berserker", "Wild Magic", "Giant"],
+        "Bard": ["Lore", "Valor", "Swords", "Glamour"],
+        "Cleric": ["Life", "Light", "Trickery", "Knowledge", "Nature", "Tempest", "War", "Death"],
+        "Druid": ["Moon", "Land", "Spores", "Stars"],
+        "Fighter": ["Battle Master", "Champion", "Eldritch Knight", "Arcane Archer"],
+        "Monk": ["Open Hand", "Shadow", "Elements", "Drunken Master"],
+        "Paladin": ["Devotion", "Ancients", "Vengeance", "Crown", "Oathbreaker"],
+        "Ranger": ["Hunter", "Beast Master", "Gloom Stalker", "Swarmkeeper"],
+        "Rogue": ["Thief", "Arcane Trickster", "Assassin", "Swashbuckler"],
+        "Sorcerer": ["Draconic", "Wild Magic", "Storm", "Shadow"],
+        "Warlock": ["Fiend", "Great Old One", "Archfey", "Hexblade"],
+        "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation", "Bladesinging"]
     };
 
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
-    const spinBtn = document.getElementById('spinBtn');
-    const subclassBtn = document.getElementById('subclassBtn');
+    const mainBtn = document.getElementById('mainBtn');
     const resultBanner = document.getElementById('result-banner');
     const historyList = document.getElementById('history-list');
-    
-    let currentOptions = [];
+
     let currentRotation = 0;
-    let lastWinner = "";
+    let rollState = "RACE"; // Sequence: RACE -> SUBRACE -> CLASS -> SUBCLASS
+    let sessionResult = { race: "", subrace: "", class: "", subclass: "" };
 
-    const container = document.getElementById('checkboxContainer');
-    Object.keys(bg3Data).forEach(cls => {
-        const lbl = document.createElement('label');
-        lbl.className = 'checkbox-label';
-        lbl.innerHTML = `<input type="checkbox" value="${cls}" checked> ${cls}`;
-        container.appendChild(lbl);
-    });
-
-    document.getElementById('allOn').onclick = () => toggleBoxes(true);
-    document.getElementById('allOff').onclick = () => toggleBoxes(false);
-    
-    function toggleBoxes(state) {
-        document.querySelectorAll('#checkboxContainer input').forEach(i => i.checked = state);
-        updateWheelPool();
+    // Setup Checkboxes
+    function setupCheckboxes(data, containerId) {
+        const container = document.getElementById(containerId);
+        Object.keys(data).forEach(key => {
+            const lbl = document.createElement('label');
+            lbl.className = 'checkbox-label';
+            lbl.innerHTML = `<input type="checkbox" data-type="${containerId}" value="${key}" checked> ${key}`;
+            container.appendChild(lbl);
+        });
     }
 
-    container.onchange = updateWheelPool;
+    setupCheckboxes(raceData, 'raceCheckboxes');
+    setupCheckboxes(classData, 'classCheckboxes');
 
-    function updateWheelPool() {
-        const checked = Array.from(document.querySelectorAll('#checkboxContainer input:checked')).map(i => i.value);
-        currentOptions = checked;
-        drawWheel(checked);
+    function toggleSet(type, state) {
+        document.querySelectorAll(`input[data-type="${type}Checkboxes"]`).forEach(i => i.checked = state);
+        if(rollState === "RACE" || rollState === "CLASS") refreshWheel();
+    }
+
+    function getSelected(type) {
+        return Array.from(document.querySelectorAll(`input[data-type="${type}Checkboxes"]:checked`)).map(i => i.value);
     }
 
     function drawWheel(options) {
         const numSlices = options.length;
-        if (numSlices === 0) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            return;
-        }
+        if (numSlices === 0) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
         const arc = (Math.PI * 2) / numSlices;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         options.forEach((opt, i) => {
             const angle = i * arc;
             ctx.fillStyle = i % 2 === 0 ? "#1a1a1e" : "#2a2a30";
-            ctx.beginPath();
-            ctx.moveTo(250, 250);
-            ctx.arc(250, 250, 250, angle, angle + arc);
-            ctx.fill();
-            ctx.strokeStyle = "#c3a34a";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.save();
-            ctx.translate(250, 250);
-            ctx.rotate(angle + arc / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = "#f5f5f7";
-            ctx.font = "bold 18px sans-serif";
-            ctx.fillText(opt, 230, 8);
-            ctx.restore();
+            ctx.beginPath(); ctx.moveTo(250, 250);
+            ctx.arc(250, 250, 250, angle, angle + arc); ctx.fill();
+            ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.save(); ctx.translate(250, 250); ctx.rotate(angle + arc / 2);
+            ctx.textAlign = "right"; ctx.fillStyle = "#f5f5f7";
+            ctx.font = "bold 16px sans-serif"; ctx.fillText(opt, 230, 8); ctx.restore();
         });
+    }
+
+    function refreshWheel() {
+        if (rollState === "RACE") drawWheel(getSelected('race'));
+        if (rollState === "CLASS") drawWheel(getSelected('class'));
+    }
+
+    function resetRotation() {
+        currentRotation = 0;
+        canvas.style.transition = 'none';
+        canvas.style.transform = 'rotate(0deg)';
+        setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
     }
 
     function spin(options, onEnd) {
-        if (options.length === 0) return;
-        
-        // Randomize extra rotations + landing spot
-        const randomExtra = Math.floor(Math.random() * 360);
-        const spinRoll = 1800 + randomExtra; 
+        if (options.length === 0) { alert("Check some boxes first!"); return; }
+        const spinRoll = 1800 + Math.floor(Math.random() * 360);
         currentRotation += spinRoll;
-        
         canvas.style.transform = `rotate(${currentRotation}deg)`;
-
-        spinBtn.disabled = true;
-        subclassBtn.disabled = true;
+        mainBtn.disabled = true;
 
         setTimeout(() => {
-            // FIX: Calculation to find the slice under the 12 o'clock pointer
-            // 1. Get the net rotation within 360 degrees
-            // 2. Adjust for the fact that slices start at 3 o'clock (90 deg offset)
             const netRotation = currentRotation % 360;
             const sliceSize = 360 / options.length;
-            
-            // The magic formula: (360 - rotation + offset) % 360
-            // We use 270 because 0 deg is 3 o'clock, so 12 o'clock is 270 deg relative to canvas start
             const winningIndex = Math.floor(((360 - netRotation + 270) % 360) / sliceSize);
-            
             onEnd(options[winningIndex]);
-        }, 5100); // Slightly longer than CSS transition to be safe
+        }, 5100);
     }
 
-    function addToHistory(text) {
-        if (historyList.innerHTML.includes("No rolls yet")) historyList.innerHTML = "";
-        const li = document.createElement('li');
-        li.innerHTML = `Result: <span>${text}</span>`;
-        historyList.prepend(li);
-    }
+    mainBtn.onclick = () => {
+        if (rollState === "RACE") {
+            const pool = getSelected('race');
+            resultBanner.innerText = "Spinning Race...";
+            spin(pool, (winner) => {
+                sessionResult.race = winner;
+                resultBanner.innerText = winner;
+                const subs = raceData[winner];
+                if (subs.length > 1 || subs[0] !== "Standard") {
+                    rollState = "SUBRACE";
+                    mainBtn.innerText = "SPIN FOR SUB-RACE";
+                    mainBtn.disabled = false;
+                    resetRotation();
+                    drawWheel(subs);
+                } else {
+                    sessionResult.subrace = "";
+                    rollState = "CLASS";
+                    mainBtn.innerText = "SPIN FOR CLASS";
+                    mainBtn.disabled = false;
+                    resetRotation();
+                    drawWheel(getSelected('class'));
+                }
+            });
+        } 
+        else if (rollState === "SUBRACE") {
+            spin(raceData[sessionResult.race], (winner) => {
+                sessionResult.subrace = winner;
+                resultBanner.innerText = `${winner} ${sessionResult.race}`;
+                rollState = "CLASS";
+                mainBtn.innerText = "SPIN FOR CLASS";
+                mainBtn.disabled = false;
+                resetRotation();
+                drawWheel(getSelected('class'));
+            });
+        }
+        else if (rollState === "CLASS") {
+            spin(getSelected('class'), (winner) => {
+                sessionResult.class = winner;
+                resultBanner.innerText = winner;
+                rollState = "SUBCLASS";
+                mainBtn.innerText = "SPIN FOR SUB-CLASS";
+                mainBtn.disabled = false;
+                resetRotation();
+                drawWheel(classData[winner]);
+            });
+        }
+        else if (rollState === "SUBCLASS") {
+            spin(classData[sessionResult.class], (winner) => {
+                sessionResult.subclass = winner;
+                const r = sessionResult;
+                const raceStr = r.subrace ? `${r.subrace} ${r.race}` : r.race;
+                const final = `${raceStr} | ${r.class} (${winner})`;
+                resultBanner.innerText = final;
+                
+                if (historyList.innerHTML.includes("No rolls yet")) historyList.innerHTML = "";
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${final}</span>`;
+                historyList.prepend(li);
 
-    spinBtn.onclick = () => {
-        if (currentOptions.length === 0) return alert("Select at least one class!");
-        resultBanner.innerText = "Spinning Class...";
-        spin(currentOptions, (winner) => {
-            lastWinner = winner;
-            resultBanner.innerText = winner;
-            spinBtn.classList.add('hidden');
-            subclassBtn.classList.remove('hidden');
-            subclassBtn.disabled = false;
-            setTimeout(() => {
-                currentRotation = 0; // Reset rotation so subclass wheel starts fresh
-                canvas.style.transition = 'none';
-                canvas.style.transform = 'rotate(0deg)';
-                drawWheel(bg3Data[winner]);
-                // Re-enable transition for next spin
-                setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
-            }, 500);
-        });
+                rollState = "RACE";
+                mainBtn.innerText = "SPIN FOR RACE";
+                mainBtn.disabled = false;
+                resetRotation();
+                refreshWheel();
+            });
+        }
     };
 
-    subclassBtn.onclick = () => {
-        resultBanner.innerText = "Spinning Subclass...";
-        spin(bg3Data[lastWinner], (sub) => {
-            const fullResult = `${lastWinner} (${sub})`;
-            resultBanner.innerText = fullResult;
-            addToHistory(fullResult);
-            subclassBtn.classList.add('hidden');
-            spinBtn.classList.remove('hidden');
-            spinBtn.disabled = false;
-            setTimeout(() => {
-                currentRotation = 0;
-                canvas.style.transition = 'none';
-                canvas.style.transform = 'rotate(0deg)';
-                updateWheelPool();
-                setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; }, 50);
-            }, 500);
-        });
-    };
-
-    updateWheelPool();
+    refreshWheel();
 </script>
 </body>
 </html>
