@@ -158,6 +158,24 @@
 </div>
 
 <script>
+    // BG3 Iconic Class Color Map
+    const classColors = {
+        "Barbarian": "#e7623e",
+        "Bard": "#ab6fac",
+        "Cleric": "#91a1b2",
+        "Druid": "#8a9a5b",
+        "Fighter": "#7f513e",
+        "Monk": "#51a5c5",
+        "Paladin": "#b59e54",
+        "Ranger": "#507f62",
+        "Rogue": "#555752",
+        "Sorcerer": "#992e2e",
+        "Warlock": "#7b469b",
+        "Wizard": "#2a50a1",
+        "Artificer": "#b15f32",
+        "Blood Hunter": "#731212"
+    };
+
     const defaultRaces = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -241,14 +259,38 @@
         if (n === 0) { ctx.clearRect(0,0,500,500); return; }
         const arc = (Math.PI*2)/n;
         ctx.clearRect(0,0,500,500);
+        
         options.forEach((opt, i) => {
-            ctx.fillStyle = i % 2 === 0 ? "#121216" : "#1d1d22";
-            ctx.beginPath(); ctx.moveTo(250,250); ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
-            ctx.strokeStyle = "#c3a34a"; ctx.lineWidth = 2; ctx.stroke();
-            ctx.save(); ctx.translate(250,250); ctx.rotate(i*arc + arc/2);
-            ctx.textAlign = "right"; ctx.fillStyle = "#c3a34a";
+            // Determine Background Color
+            let bgColor;
+            if (classColors[opt]) {
+                bgColor = classColors[opt]; // Use specific class color
+            } else {
+                bgColor = i % 2 === 0 ? "#121216" : "#1d1d22"; // Alternating default
+            }
+
+            ctx.fillStyle = bgColor;
+            ctx.beginPath();
+            ctx.moveTo(250,250);
+            ctx.arc(250,250,250, i*arc, (i+1)*arc);
+            ctx.fill();
+
+            // Border
+            ctx.strokeStyle = "#c3a34a";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Text Label
+            ctx.save();
+            ctx.translate(250,250);
+            ctx.rotate(i*arc + arc/2);
+            ctx.textAlign = "right";
+            
+            // Text color logic: make it black on light backgrounds, gold on dark
+            ctx.fillStyle = (classColors[opt]) ? "#ffffff" : "#c3a34a";
             ctx.font = `bold ${n > 12 ? '14' : '18'}px 'Cinzel'`; 
-            ctx.fillText(opt.toUpperCase(), 235, 6); ctx.restore();
+            ctx.fillText(opt.toUpperCase(), 235, 6);
+            ctx.restore();
         });
     }
 
@@ -324,7 +366,7 @@
 
     mainBtn.onclick = () => {
         if (rollState === "START") {
-            nextStep(); // This now correctly sets the phase to RACE or skips
+            nextStep();
         } 
         else if (rollState === "RACE") {
             spin(getActive('raceCheckboxes'), (win) => {
