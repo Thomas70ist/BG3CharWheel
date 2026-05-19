@@ -10,11 +10,13 @@
             --card-color: #1a1a1e;
             --accent-color: #da1f3d;
             --text-color: #f5f5f7;
+            --text-muted: #a0a0a5;
             --gold: #c3a34a;
         }
 
         body {
-            font-family: 'serif', 'Palatino', 'Georgia', serif;
+            /* Restoring the modern Sans-Serif font */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -24,29 +26,31 @@
             align-items: center;
         }
 
-        .container { max-width: 800px; width: 100%; text-align: center; }
+        .container { max-width: 600px; width: 100%; text-align: center; }
         
+        h1 { margin-bottom: 5px; }
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+
         .wheel-wrapper {
             position: relative;
-            width: 350px;
-            height: 350px;
-            margin: 30px auto;
-            border: 8px solid var(--gold);
+            width: 320px;
+            height: 320px;
+            margin: 20px auto;
+            border: 6px solid var(--gold);
             border-radius: 50%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8), 0 0 15px var(--gold);
+            box-shadow: 0 0 25px rgba(0,0,0,0.7);
         }
 
-        /* The Triangle Pointer */
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; 
             height: 0; 
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--gold);
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 25px solid var(--gold);
             z-index: 10;
         }
 
@@ -63,46 +67,76 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .card h3 { margin-top: 0; font-size: 0.9rem; color: var(--gold); text-transform: uppercase; }
+
+        .controls { margin-bottom: 15px; }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            padding: 0;
+            margin-right: 10px;
         }
 
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
             gap: 8px;
-            text-align: left;
-            margin-top: 15px;
         }
 
         .checkbox-label {
-            font-size: 0.85rem;
-            background: #222;
-            padding: 5px;
+            font-size: 0.8rem;
+            background: #25252a;
+            padding: 6px;
             border-radius: 4px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
         }
+        .checkbox-label input { margin-right: 6px; accent-color: var(--accent-color); }
 
         .btn {
             background: linear-gradient(to bottom, #da1f3d, #8b1426);
             color: white;
             border: 1px solid var(--gold);
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 15px;
+            width: 100%;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 4px;
-            margin-top: 10px;
+            border-radius: 6px;
         }
 
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.5; }
 
         #result-banner {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: var(--gold);
-            margin: 20px 0;
-            min-height: 2.5rem;
-            text-shadow: 0 0 10px rgba(195, 163, 74, 0.5);
+            margin: 15px 0;
+            font-weight: bold;
+            height: 1.8rem;
         }
+
+        /* Roll History Styling */
+        #history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        #history-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+        }
+        #history-list li span { color: var(--gold); font-weight: bold; }
 
         .hidden { display: none; }
     </style>
@@ -110,9 +144,15 @@
 <body>
 
 <div class="container">
-    <h1>Baldur's Gate 3 Roll</h1>
+    <h1>BG3 Spinner</h1>
+    <div class="subtitle">Character Class & Subclass Roller</div>
     
     <div class="card">
+        <h3>1. Available Classes</h3>
+        <div class="controls">
+            <button class="toggle-btn" id="allOn">Select All</button>
+            <button class="toggle-btn" id="allOff">Clear All</button>
+        </div>
         <div class="checkbox-grid" id="checkboxContainer"></div>
     </div>
 
@@ -121,10 +161,17 @@
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
     </div>
 
-    <div id="result-banner">Select classes & spin!</div>
+    <div id="result-banner">Ready to Roll</div>
     
-    <button class="btn" id="spinBtn">Spin for Class</button>
-    <button class="btn hidden" id="subclassBtn">Spin for Subclass</button>
+    <button class="btn" id="spinBtn">SPIN FOR CLASS</button>
+    <button class="btn hidden" id="subclassBtn">SPIN FOR SUBCLASS</button>
+
+    <div class="card" style="margin-top: 20px;">
+        <h3>Roll History</h3>
+        <ul id="history-list">
+            <li style="color: var(--text-muted);">No rolls yet...</li>
+        </ul>
+    </div>
 </div>
 
 <script>
@@ -148,10 +195,10 @@
     const spinBtn = document.getElementById('spinBtn');
     const subclassBtn = document.getElementById('subclassBtn');
     const resultBanner = document.getElementById('result-banner');
+    const historyList = document.getElementById('history-list');
     
     let currentOptions = [];
     let currentRotation = 0;
-    let isRollingSubclass = false;
     let lastWinner = "";
 
     // 1. Initialize Checkboxes
@@ -159,20 +206,34 @@
     Object.keys(bg3Data).forEach(cls => {
         const lbl = document.createElement('label');
         lbl.className = 'checkbox-label';
-        lbl.innerHTML = `<input type="checkbox" value="${cls}" checked onchange="updateWheelPool()"> ${cls}`;
+        lbl.innerHTML = `<input type="checkbox" value="${cls}" checked> ${cls}`;
         container.appendChild(lbl);
     });
 
-    function updateWheelPool() {
-        if (isRollingSubclass) return;
-        const checked = Array.from(document.querySelectorAll('input:checked')).map(i => i.value);
-        drawWheel(checked);
-        currentOptions = checked;
+    // 2. Select All/None
+    document.getElementById('allOn').onclick = () => toggleBoxes(true);
+    document.getElementById('allOff').onclick = () => toggleBoxes(false);
+    
+    function toggleBoxes(state) {
+        document.querySelectorAll('#checkboxContainer input').forEach(i => i.checked = state);
+        updateWheelPool();
     }
 
-    // 2. Draw the Wheel
+    container.onchange = updateWheelPool;
+
+    function updateWheelPool() {
+        const checked = Array.from(document.querySelectorAll('#checkboxContainer input:checked')).map(i => i.value);
+        currentOptions = checked;
+        drawWheel(checked);
+    }
+
+    // 3. Draw the Wheel (Styled for Modern Font)
     function drawWheel(options) {
         const numSlices = options.length;
+        if (numSlices === 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return;
+        }
         const arc = (Math.PI * 2) / numSlices;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -184,25 +245,24 @@
             ctx.arc(250, 250, 250, angle, angle + arc);
             ctx.fill();
             ctx.strokeStyle = "#c3a34a";
+            ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Add Text
             ctx.save();
             ctx.translate(250, 250);
             ctx.rotate(angle + arc / 2);
             ctx.textAlign = "right";
             ctx.fillStyle = "#f5f5f7";
-            ctx.font = "bold 18px serif";
-            ctx.fillText(opt, 230, 10);
+            ctx.font = "bold 16px sans-serif"; // Modern font applied here
+            ctx.fillText(opt, 230, 8);
             ctx.restore();
         });
     }
 
-    // 3. Spin Logic
+    // 4. Spin Logic
     function spin(options, onEnd) {
         if (options.length === 0) return;
-        
-        const spinRoll = Math.floor(Math.random() * 360) + 1440; // At least 4 full spins
+        const spinRoll = Math.floor(Math.random() * 360) + 1800; 
         currentRotation += spinRoll;
         canvas.style.transform = `rotate(-${currentRotation}deg)`;
 
@@ -213,35 +273,39 @@
             const actualDeg = currentRotation % 360;
             const arcDeg = 360 / options.length;
             const winningIndex = Math.floor(actualDeg / arcDeg);
-            const winner = options[winningIndex];
-            onEnd(winner);
+            onEnd(options[winningIndex]);
         }, 4000);
     }
 
+    function addToHistory(text) {
+        if (historyList.innerHTML.includes("No rolls yet")) historyList.innerHTML = "";
+        const li = document.createElement('li');
+        li.innerHTML = `Rolled: <span>${text}</span>`;
+        historyList.prepend(li);
+    }
+
     spinBtn.onclick = () => {
-        isRollingSubclass = false;
+        if (currentOptions.length === 0) return alert("Select at least one class!");
         resultBanner.innerText = "Rolling Class...";
         spin(currentOptions, (winner) => {
             lastWinner = winner;
-            resultBanner.innerText = "CLASS: " + winner;
+            resultBanner.innerText = winner.toUpperCase();
             spinBtn.classList.add('hidden');
             subclassBtn.classList.remove('hidden');
             subclassBtn.disabled = false;
-            
-            // Prepare Subclass Wheel
             setTimeout(() => drawWheel(bg3Data[winner]), 100);
         });
     };
 
     subclassBtn.onclick = () => {
-        isRollingSubclass = true;
         resultBanner.innerText = "Rolling Subclass...";
         spin(bg3Data[lastWinner], (sub) => {
-            resultBanner.innerText = `${lastWinner} (${sub})`;
+            const fullResult = `${lastWinner} (${sub})`;
+            resultBanner.innerText = fullResult;
+            addToHistory(fullResult);
             subclassBtn.classList.add('hidden');
             spinBtn.classList.remove('hidden');
             spinBtn.disabled = false;
-            // Reset to main classes
             setTimeout(updateWheelPool, 2000);
         });
     };
