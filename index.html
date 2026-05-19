@@ -43,7 +43,7 @@
         .mod-pack-container { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
         .mod-pack-btn { 
             background: #25252a; border: 1px solid var(--gold); color: var(--gold); 
-            padding: 14px 22px; font-family: var(--font-header); font-size: 0.9rem; 
+            padding: 14px 22px; font-family: var(--font-header); font-size: 0.8rem; 
             cursor: pointer; border-radius: 4px; transition: 0.3s;
         }
         .mod-pack-btn:hover { background: var(--gold); color: black; }
@@ -79,14 +79,16 @@
         .checkbox-label input { transform: scale(1.4); margin-right: 12px; accent-color: var(--accent-color); }
 
         .btn { font-family: var(--font-header); background: linear-gradient(to bottom, #da1f3d, #8b1426); color: white; border: 1px solid var(--gold); padding: 22px; width: 100%; font-size: 1.7rem; cursor: pointer; letter-spacing: 4px; margin-top: 20px; border-radius: 4px; }
-        .btn:disabled { opacity: 0.4; cursor: wait; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
         
-        #result-banner { font-family: var(--font-header); font-size: 1.8rem; color: var(--gold); margin: 30px 0; min-height: 5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-        #result-banner i { display: block; font-size: 3rem; margin-bottom: 10px; color: var(--gold); }
+        #result-banner { font-family: var(--font-header); font-size: 1.8rem; color: var(--gold); margin: 30px 0; min-height: 5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .result-icons { display: flex; gap: 20px; font-size: 2.5rem; margin-bottom: 10px; }
+        .result-text { max-width: 80%; }
 
         .add-custom { display: flex; gap: 12px; width: 100%; margin-top: 20px; }
         .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 12px; font-family: var(--font-body); font-size: 1.1rem; }
         .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 30px; cursor: pointer; font-family: var(--font-header); }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -121,7 +123,7 @@
         <h3>II. Race Filters</h3>
         <div id="raceCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addRaceInput" placeholder="Add custom race (e.g. Aasimar)">
+            <input type="text" id="addRaceInput" placeholder="Add custom race...">
             <button onclick="addCustomOption('raceCheckboxes', 'addRaceInput', raceData)">+</button>
         </div>
     </div>
@@ -130,7 +132,7 @@
         <h3>III. Class Filters</h3>
         <div id="classCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addClassInput" placeholder="Add custom class (e.g. Artificer)">
+            <input type="text" id="addClassInput" placeholder="Add custom class...">
             <button onclick="addCustomOption('classCheckboxes', 'addClassInput', classData)">+</button>
         </div>
     </div>
@@ -139,7 +141,7 @@
         <h3>IV. Background Filters</h3>
         <div id="bgCheckboxes" class="checkbox-grid"></div>
         <div class="add-custom">
-            <input type="text" id="addBGInput" placeholder="Add custom background">
+            <input type="text" id="addBGInput" placeholder="Add custom background...">
             <button onclick="addCustomOption('bgCheckboxes', 'addBGInput', backgrounds)">+</button>
         </div>
     </div>
@@ -172,7 +174,11 @@
         "Elf": "fa-solid fa-clover", "Tiefling": "fa-solid fa-fire", "Drow": "fa-solid fa-moon",
         "Human": "fa-solid fa-person", "Githyanki": "fa-solid fa-dragon", "Dwarf": "fa-solid fa-mountain",
         "Half-Elf": "fa-solid fa-dna", "Halfling": "fa-solid fa-wheat-awn", "Gnome": "fa-solid fa-flask",
-        "Dragonborn": "fa-solid fa-dragon-li", "Half-Orc": "fa-solid fa-skull"
+        "Dragonborn": "fa-solid fa-worm", "Half-Orc": "fa-solid fa-skull",
+        "Acolyte": "fa-solid fa-scroll", "Charlatan": "fa-solid fa-masks-theater", "Criminal": "fa-solid fa-sack-dollar",
+        "Entertainer": "fa-solid fa-music", "Folk Hero": "fa-solid fa-hammer", "Guild Artisan": "fa-solid fa-toolbox",
+        "Noble": "fa-solid fa-crown", "Outlander": "fa-solid fa-map", "Sage": "fa-solid fa-book", 
+        "Soldier": "fa-solid fa-medal", "Urchin": "fa-solid fa-rat"
     };
 
     const classColors = {
@@ -214,7 +220,7 @@
     let rollState = "START"; 
     let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
 
-    function getIcon(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
+    function getIconHTML(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
 
     function populate(data, id) {
         const container = document.getElementById(id);
@@ -223,7 +229,7 @@
         keys.forEach(k => {
             const lbl = document.createElement('label');
             lbl.className = 'checkbox-label';
-            lbl.innerHTML = `<input type="checkbox" value="${k}" checked onchange="refreshWheel()"> ${getIcon(k)} ${k}`;
+            lbl.innerHTML = `<input type="checkbox" value="${k}" checked onchange="refreshWheel()"> ${getIconHTML(k)} ${k}`;
             container.appendChild(lbl);
         });
     }
@@ -269,25 +275,38 @@
         mainBtn.disabled = false;
         if (rollState === "START") {
             if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); }
-            else { sessionResult.gender = "Chosen"; rollState = "RACE_PENDING"; nextStep(); }
+            else { sessionResult.gender = ""; rollState = "RACE_PENDING"; nextStep(); }
         } else if (rollState === "RACE_PENDING") {
             if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); }
-            else { sessionResult.race = "Chosen"; rollState = "CLASS_PENDING"; nextStep(); }
+            else { sessionResult.race = ""; rollState = "CLASS_PENDING"; nextStep(); }
         } else if (rollState === "CLASS_PENDING") {
             if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); }
-            else { sessionResult.class = "Chosen"; rollState = "BG_PENDING"; nextStep(); }
+            else { sessionResult.class = ""; rollState = "BG_PENDING"; nextStep(); }
         } else if (rollState === "BG_PENDING") {
             if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); }
-            else { sessionResult.background = "Chosen"; finalize(); }
+            else { sessionResult.background = ""; finalize(); }
         }
     }
 
     function finalize() {
+        mainBtn.disabled = false; // Fix: ensure button is clickable if logic error occurs
         const r = sessionResult;
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
         const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
-        resultBanner.innerHTML = `${getIcon(r.class)} ${total}`;
-        mainBtn.classList.add('hidden'); resetBtn.classList.remove('hidden');
+        
+        // Icon Row
+        resultBanner.innerHTML = `
+            <div class="result-icons">
+                ${r.gender ? getIconHTML(r.gender) : ''}
+                ${r.race ? getIconHTML(r.race) : ''}
+                ${r.class ? getIconHTML(r.class) : ''}
+                ${r.background ? getIconHTML(r.background) : ''}
+            </div>
+            <div class="result-text">${total}</div>
+        `;
+
+        mainBtn.classList.add('hidden');
+        resetBtn.classList.remove('hidden');
     }
 
     function resetWheelPos(cb) {
@@ -304,26 +323,36 @@
 
     mainBtn.onclick = () => {
         if (rollState === "START") nextStep();
-        else if (rollState === "GENDER") { spin(getActive('genderCheckboxes'), (win) => { sessionResult.gender = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`; rollState = "RACE_PENDING"; nextStep(); }); }
+        else if (rollState === "GENDER") { 
+            spin(getActive('genderCheckboxes'), (win) => { 
+                sessionResult.gender = win; 
+                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`; 
+                rollState = "RACE_PENDING"; nextStep(); 
+            }); 
+        }
         else if (rollState === "RACE") {
             spin(getActive('raceCheckboxes'), (win) => {
-                sessionResult.race = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`;
+                sessionResult.race = win; 
+                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
                 const subs = raceData[win];
                 if (subs && (subs.length > 1 || subs[0] !== "Standard")) {
                     rollState = "SUBRACE"; mainBtn.innerText = "SPIN SUB-RACE"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(subs));
                 } else { rollState = "CLASS_PENDING"; nextStep(); }
             });
         }
-        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerHTML = `${win} ${sessionResult.race}`; rollState = "CLASS_PENDING"; nextStep(); }); }
+        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerHTML = `${getIconHTML(sessionResult.race)} <b>${win} ${sessionResult.race}</b>`; rollState = "CLASS_PENDING"; nextStep(); }); }
         else if (rollState === "CLASS") {
             spin(getActive('classCheckboxes'), (win) => {
-                sessionResult.class = win; resultBanner.innerHTML = `${getIcon(win)} ${win}`;
+                sessionResult.class = win; 
+                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
                 rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win]));
             });
         }
-        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${sessionResult.class} (${win})`; rollState = "BG_PENDING"; nextStep(); }); }
+        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${getIconHTML(sessionResult.class)} <b>${sessionResult.class} (${win})</b>`; rollState = "BG_PENDING"; nextStep(); }); }
         else if (rollState === "BACKGROUND") { spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); }); }
     };
+
+    resetBtn.onclick = () => location.reload();
 
     function triggerTotalWipe() { location.reload(); }
     function injectModPack(type) {
