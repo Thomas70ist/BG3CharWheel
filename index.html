@@ -24,6 +24,7 @@
             background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
             font-size: 1.3rem;
+            scroll-behavior: smooth; /* Ensures smooth movement */
         }
 
         .container { max-width: 900px; width: 100%; text-align: center; position: relative; }
@@ -152,7 +153,7 @@
         </div>
     </div>
 
-    <div class="wheel-wrapper">
+    <div class="wheel-wrapper" id="wheelSection">
         <div class="pointer"></div>
         <canvas id="wheelCanvas" width="500" height="500"></canvas>
     </div>
@@ -229,6 +230,11 @@
     let rollState = "START"; 
     let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
 
+    // Function to scroll to the wheel smoothly
+    function scrollToWheel() {
+        document.getElementById('wheelSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     function getIconHTML(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
 
     function populate(data, id) {
@@ -270,6 +276,7 @@
     }
 
     function spin(options, onEnd) {
+        scrollToWheel(); // Ensure view is correct when spinning starts
         const roll = 1800 + Math.floor(Math.random()*360);
         currentRotation += roll;
         canvas.style.transform = `rotate(${currentRotation}deg)`;
@@ -283,16 +290,16 @@
     function nextStep() {
         mainBtn.disabled = false;
         if (rollState === "START") {
-            if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); }
+            if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); scrollToWheel(); }
             else { sessionResult.gender = ""; rollState = "RACE_PENDING"; nextStep(); }
         } else if (rollState === "RACE_PENDING") {
-            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); }
+            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); scrollToWheel(); }
             else { sessionResult.race = ""; rollState = "CLASS_PENDING"; nextStep(); }
         } else if (rollState === "CLASS_PENDING") {
-            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); }
+            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); scrollToWheel(); }
             else { sessionResult.class = ""; rollState = "BG_PENDING"; nextStep(); }
         } else if (rollState === "BG_PENDING") {
-            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); }
+            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); scrollToWheel(); }
             else { sessionResult.background = ""; finalize(); }
         }
     }
@@ -302,10 +309,8 @@
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
         const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         
-        // Audio Chime
         victorySound.play().catch(() => {});
 
-        // Update Banner
         resultBanner.innerHTML = `
             <div class="result-icons">
                 ${r.gender ? getIconHTML(r.gender) : ''}
@@ -316,7 +321,6 @@
             <div class="result-text">${total}</div>
         `;
 
-        // Add to History
         const placeholder = document.getElementById('history-placeholder');
         if (placeholder) placeholder.remove();
 
@@ -327,6 +331,7 @@
         mainBtn.classList.add('hidden');
         resetBtn.classList.remove('hidden');
         mainBtn.disabled = false;
+        scrollToWheel(); 
     }
 
     function resetWheelPos(cb) {
@@ -341,7 +346,10 @@
         mainBtn.innerText = "BEGIN JOURNEY";
         mainBtn.classList.remove('hidden');
         resetBtn.classList.add('hidden');
-        resetWheelPos(() => refreshWheel());
+        resetWheelPos(() => {
+            refreshWheel();
+            scrollToWheel();
+        });
     }
 
     function refreshWheel() {
@@ -352,7 +360,6 @@
     }
 
     mainBtn.onclick = () => {
-        // Prime audio for browser
         if(victorySound.paused) { victorySound.play().then(() => { victorySound.pause(); victorySound.currentTime = 0; }).catch(()=>{}); }
 
         if (rollState === "START") nextStep();
@@ -369,7 +376,7 @@
                 resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
                 const subs = raceData[win];
                 if (subs && (subs.length > 1 || subs[0] !== "Standard")) {
-                    rollState = "SUBRACE"; mainBtn.innerText = "SPIN SUB-RACE"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(subs));
+                    rollState = "SUBRACE"; mainBtn.innerText = "SPIN SUB-RACE"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(subs)); scrollToWheel();
                 } else { rollState = "CLASS_PENDING"; nextStep(); }
             });
         }
@@ -378,7 +385,7 @@
             spin(getActive('classCheckboxes'), (win) => {
                 sessionResult.class = win; 
                 resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
-                rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win]));
+                rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win])); scrollToWheel();
             });
         }
         else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${getIconHTML(sessionResult.class)} <b>${sessionResult.class} (${win})</b>`; rollState = "BG_PENDING"; nextStep(); }); }
