@@ -98,6 +98,8 @@
 <body>
 
 <div class="container">
+    <audio id="victory-sound" src="https://www.myinstants.com/media/sounds/level-up-rpg.mp3" preload="auto"></audio>
+
     <button class="global-reset" onclick="location.reload()" title="Full Reset Page">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
@@ -220,6 +222,8 @@
     const resetBtn = document.getElementById('resetBtn');
     const resultBanner = document.getElementById('result-banner');
     const historyList = document.getElementById('history-list');
+    const victorySound = document.getElementById('victory-sound');
+    victorySound.volume = 0.4;
 
     let currentRotation = 0;
     let rollState = "START"; 
@@ -298,6 +302,9 @@
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
         const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         
+        // Audio Chime
+        victorySound.play().catch(() => {});
+
         // Update Banner
         resultBanner.innerHTML = `
             <div class="result-icons">
@@ -309,7 +316,7 @@
             <div class="result-text">${total}</div>
         `;
 
-        // Add to History List
+        // Add to History
         const placeholder = document.getElementById('history-placeholder');
         if (placeholder) placeholder.remove();
 
@@ -345,6 +352,9 @@
     }
 
     mainBtn.onclick = () => {
+        // Prime audio for browser
+        if(victorySound.paused) { victorySound.play().then(() => { victorySound.pause(); victorySound.currentTime = 0; }).catch(()=>{}); }
+
         if (rollState === "START") nextStep();
         else if (rollState === "GENDER") { 
             spin(getActive('genderCheckboxes'), (win) => { 
