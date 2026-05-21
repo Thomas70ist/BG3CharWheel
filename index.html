@@ -98,102 +98,33 @@
         .clear-btn { background: none; border: 1px solid #da1f3d; color: #da1f3d; font-size: 0.7rem; padding: 4px 8px; cursor: pointer; font-family: var(--font-header); border-radius: 3px; }
         .clear-btn:hover { background: #da1f3d; color: white; }
 
-        /* Character Snapshot Card Styling */
-.snapshot-card {
-    background: url('https://i.imgur.com/k8X60nU.png') center/cover; /* Aged parchment texture */
-    border: 2px solid #5a4b3f; /* Dark leather-like border */
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    margin: 30px auto;
-    padding: 20px;
-    width: 100%;
-    max-width: 600px;
-    text-align: center;
-    color: #f5f5f7;
-    position: relative;
-}
+        .snapshot-card {
+            background: #2a241e; /* Solid backup color */
+            background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+            border: 4px double #5a4b3f;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin: 30px auto;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            color: #f5f5f7;
+        }
 
-.card-header h3 {
-    font-family: var(--font-header);
-    color: #d1b17d; /* Gold-embossed look */
-    letter-spacing: 3px;
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-}
-
-.header-divider {
-    display: inline-block;
-    width: 20px;
-    height: 2px;
-    background-color: #5a4b3f;
-    margin: 0 10px;
-}
-
-.card-header h4 {
-    font-family: var(--font-body);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-top: 0;
-}
-
-.card-seals {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-.fate-seal {
-    width: 80px;
-    height: 80px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
-}
-
-.copy-box {
-    margin-top: 20px;
-    text-align: right;
-}
-
-.copy-btn {
-    background: none;
-    border: 1px solid #d1b17d;
-    color: #d1b17d;
-    font-family: var(--font-header);
-    font-size: 0.7rem;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: color 0.2s, background-color 0.2s;
-}
-
-.copy-btn:hover {
-    background-color: #d1b17d;
-    color: #0f0f12;
-}
-
-.copy-btn i { margin-left: 8px; }
-
-        .fate-seal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: #d1b17d;
-    background: rgba(0,0,0,0.3);
-    border-radius: 50%;
-    border: 2px inset #5a4b3f;
-}
-        
+        .card-header h3 { font-family: var(--font-header); color: #d1b17d; letter-spacing: 3px; font-size: 1.2rem; margin-bottom: 5px; }
+        .header-divider { display: inline-block; width: 20px; height: 2px; background-color: #5a4b3f; margin: 0 10px; }
+        .card-seals { display: flex; justify-content: center; gap: 15px; margin: 25px 0; }
+        .fate-seal { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #d1b17d; background: rgba(0,0,0,0.3); border-radius: 50%; border: 2px inset #5a4b3f; }
+        .copy-box { margin-top: 20px; text-align: right; }
+        .copy-btn { background: none; border: 1px solid #d1b17d; color: #d1b17d; font-family: var(--font-header); font-size: 0.7rem; padding: 8px 15px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .copy-btn:hover { background-color: #d1b17d; color: #0f0f12; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <audio id="victory-sound" src="https://www.myinstants.com/media/sounds/level-up-rpg.mp3" preload="auto"></audio>
-
     <button class="global-reset" onclick="clearAllStorage()" title="Full Reset Page & Storage">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
@@ -255,8 +186,8 @@
 
     <div id="snapshot-card" class="snapshot-card hidden">
       <div class="card-header">
-        <h3>BDG 3 <span class="header-divider"></span> EPIC ADVENTURE ROLL</h3>
-        <h4>Fate’s Decree</h4>
+        <h3>BG3 <span class="header-divider"></span> EPIC ADVENTURE ROLL</h3>
+        <h4 style="color: #a0a0a5; font-family: var(--font-body); font-size: 0.9rem; margin-top: 0;">Fate’s Decree</h4>
       </div>
       <div class="card-seals">
         <div id="gender-seal" class="fate-seal"></div>
@@ -281,7 +212,6 @@
 </div>
 
 <script>
-    // Constants & Mapping
     const iconMap = {
         "Male": "fa-solid fa-mars", "Female": "fa-solid fa-venus", "Trans-Male": "fa-solid fa-mars-double", 
         "Trans-Female": "fa-solid fa-venus-double", "Non-Binary": "fa-solid fa-genderless",
@@ -307,7 +237,6 @@
         "Artificer": "#b15f32", "Blood Hunter": "#731212"
     };
 
-    // Defaults
     const defaultRaces = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -326,7 +255,6 @@
     const defaultBGs = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Noble", "Outlander", "Sage", "Soldier", "Urchin"];
     const genderData = ["Male", "Female", "Trans-Male", "Trans-Female", "Non-Binary"];
     
-    // State Variables
     let raceData = JSON.parse(localStorage.getItem('bg3_races')) || JSON.parse(JSON.stringify(defaultRaces));
     let classData = JSON.parse(localStorage.getItem('bg3_classes')) || JSON.parse(JSON.stringify(defaultClasses));
     let backgrounds = JSON.parse(localStorage.getItem('bg3_bgs')) || [...defaultBGs];
@@ -339,16 +267,14 @@
     const resultBanner = document.getElementById('result-banner');
     const historyList = document.getElementById('history-list');
     const victorySound = document.getElementById('victory-sound');
-    victorySound.volume = 0.4;
     const snapshotCard = document.getElementById('snapshot-card');
     const copyBtn = document.getElementById('copyBtn');
-    let sessionResultString = ""; // This stores the text for the copy button
-    
+
     let currentRotation = 0;
     let rollState = "START"; 
     let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
+    let sessionResultString = "";
 
-    // STORAGE LOGIC
     function saveAllToStorage() {
         localStorage.setItem('bg3_races', JSON.stringify(raceData));
         localStorage.setItem('bg3_classes', JSON.stringify(classData));
@@ -357,30 +283,17 @@
     }
 
     function clearAllStorage() {
-        if(confirm("This will delete all custom mod entries and your history. Are you sure?")) {
-            localStorage.clear();
-            location.reload();
-        }
+        if(confirm("Delete all data?")) { localStorage.clear(); location.reload(); }
     }
 
     function clearHistory() {
-        rollingHistory = [];
-        saveAllToStorage();
-        renderHistory();
+        rollingHistory = []; saveAllToStorage(); renderHistory();
     }
 
-    // SCROLL LOGIC
     function scrollToWheel() {
-        const section = document.getElementById('wheelSection');
-        const offset = 100;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = section.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - (window.innerHeight / 2) + (section.offsetHeight / 2) + offset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        window.scrollTo({ top: document.getElementById('wheelSection').offsetTop - 50, behavior: 'smooth' });
     }
 
-    // UI RENDERING
     function getIconHTML(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
 
     function populate(data, id) {
@@ -396,11 +309,7 @@
     }
 
     function renderHistory() {
-        historyList.innerHTML = "";
-        if (rollingHistory.length === 0) {
-            historyList.innerHTML = `<li id="history-placeholder" style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li>`;
-            return;
-        }
+        historyList.innerHTML = rollingHistory.length ? "" : '<li style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li>';
         rollingHistory.forEach((entry, idx) => {
             const li = document.createElement('li');
             li.innerHTML = `<span>ENTRY #${rollingHistory.length - idx}</span>${entry}`;
@@ -409,21 +318,17 @@
     }
 
     function syncUI() {
-        document.getElementById('cardGender').classList.toggle('disabled', !document.getElementById('spinGender').checked);
-        document.getElementById('cardRace').classList.toggle('disabled', !document.getElementById('spinRace').checked);
-        document.getElementById('cardClass').classList.toggle('disabled', !document.getElementById('spinClass').checked);
-        document.getElementById('cardBG').classList.toggle('disabled', !document.getElementById('spinBG').checked);
+        ['Gender', 'Race', 'Class', 'BG'].forEach(s => document.getElementById('card'+s).classList.toggle('disabled', !document.getElementById('spin'+s).checked));
         refreshWheel();
     }
 
     function getActive(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value); }
 
-    // WHEEL LOGIC
     function drawWheel(options) {
         const n = options.length;
-        if (n === 0) { ctx.clearRect(0,0,500,500); return; }
-        const arc = (Math.PI*2)/n;
         ctx.clearRect(0,0,500,500);
+        if (n === 0) return;
+        const arc = (Math.PI*2)/n;
         options.forEach((opt, i) => {
             ctx.fillStyle = classColors[opt] || (i % 2 === 0 ? "#121216" : "#1d1d22");
             ctx.beginPath(); ctx.moveTo(250,250); ctx.arc(250,250,250, i*arc, (i+1)*arc); ctx.fill();
@@ -450,94 +355,43 @@
     function nextStep() {
         mainBtn.disabled = false;
         if (rollState === "START") {
-            if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); scrollToWheel(); }
-            else { sessionResult.gender = ""; rollState = "RACE_PENDING"; nextStep(); }
+            if (document.getElementById('spinGender').checked) { rollState = "GENDER"; mainBtn.innerText = "SPIN FOR GENDER"; drawWheel(getActive('genderCheckboxes')); }
+            else { rollState = "RACE_PENDING"; nextStep(); }
         } else if (rollState === "RACE_PENDING") {
-            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); scrollToWheel(); }
-            else { sessionResult.race = ""; rollState = "CLASS_PENDING"; nextStep(); }
+            if (document.getElementById('spinRace').checked) { rollState = "RACE"; mainBtn.innerText = "SPIN FOR RACE"; resetWheelPos(() => drawWheel(getActive('raceCheckboxes'))); }
+            else { rollState = "CLASS_PENDING"; nextStep(); }
         } else if (rollState === "CLASS_PENDING") {
-            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); scrollToWheel(); }
-            else { sessionResult.class = ""; rollState = "BG_PENDING"; nextStep(); }
+            if (document.getElementById('spinClass').checked) { rollState = "CLASS"; mainBtn.innerText = "SPIN FOR CLASS"; resetWheelPos(() => drawWheel(getActive('classCheckboxes'))); }
+            else { rollState = "BG_PENDING"; nextStep(); }
         } else if (rollState === "BG_PENDING") {
-            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); scrollToWheel(); }
-            else { sessionResult.background = ""; finalize(); }
+            if (document.getElementById('spinBG').checked) { rollState = "BACKGROUND"; mainBtn.innerText = "SPIN FOR BACKGROUND"; resetWheelPos(() => drawWheel(getActive('bgCheckboxes'))); }
+            else { finalize(); }
         }
     }
 
     function finalize() {
         const r = sessionResult;
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
-        const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
+        sessionResultString = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`.replace(/^[ |()]+|[ |()]+$/g, "");
         
-        sessionResultString = total; 
-        victorySound.play().catch(() => {});
+        victorySound.play().catch(()=>{});
+        resultBanner.innerHTML = `<div class="result-icons">${r.gender?getIconHTML(r.gender):''} ${r.race?getIconHTML(r.race):''} ${r.class?getIconHTML(r.class):''} ${r.background?getIconHTML(r.background):''}</div><div class="result-text">${sessionResultString}</div>`;
 
-        resultBanner.innerHTML = `
-            <div class="result-icons">
-                ${r.gender ? getIconHTML(r.gender) : ''}
-                ${r.race ? getIconHTML(r.race) : ''}
-                ${r.class ? getIconHTML(r.class) : ''}
-                ${r.background ? getIconHTML(r.background) : ''}
-            </div>
-            <div class="result-text">${total}</div>
-        `;
+        document.getElementById('gender-seal').innerHTML = r.gender ? getIconHTML(r.gender) : '';
+        document.getElementById('race-seal').innerHTML = r.race ? getIconHTML(r.race) : '';
+        document.getElementById('class-seal').innerHTML = r.class ? getIconHTML(r.class) : '';
+        document.getElementById('background-seal').innerHTML = r.background ? getIconHTML(r.background) : '';
 
-        // POPULATE THE SNAPSHOT CARD SEALS WITH ICONS
-        document.getElementById('gender-seal').innerHTML = getIconHTML(r.gender);
-        document.getElementById('race-seal').innerHTML = getIconHTML(r.race);
-        document.getElementById('class-seal').innerHTML = getIconHTML(r.class);
-        document.getElementById('background-seal').innerHTML = getIconHTML(r.background);
-
-        // REVEAL THE CARD
         snapshotCard.classList.remove('hidden');
-        copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>';
+        rollingHistory.unshift(sessionResultString);
+        saveAllToStorage(); renderHistory();
 
-        rollingHistory.unshift(total);
-        saveAllToStorage();
-        renderHistory();
-
-        mainBtn.classList.add('hidden');
-        resetBtn.classList.remove('hidden');
-        mainBtn.disabled = false;
-        scrollToWheel();
-    }
-    
-    // Prepare Snapshot Card data
-    sessionResultString = total; // Save string for copy function
-
-    // Populate the card's icons (this would need image files or similar)
-    document.getElementById('gender-seal').style.backgroundImage = `url('path_to_gender_icon.png')`; // Replace with actual paths
-    document.getElementById('race-seal').style.backgroundImage = `url('path_to_race_icon.png')`; // Replace with actual paths
-    document.getElementById('class-seal').style.backgroundImage = `url('path_to_class_icon.png')`; // Replace with actual paths
-    document.getElementById('background-seal').style.backgroundImage = `url('path_to_background_icon.png')`; // Replace with actual paths
-
-    snapshotCard.classList.remove('hidden'); // Reveal the card
-    copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>'; // Reset button text
-
-    mainBtn.classList.add('hidden');
-    resetBtn.classList.remove('hidden');
-    mainBtn.disabled = false;
-    scrollToWheel();
-}
+        mainBtn.classList.add('hidden'); resetBtn.classList.remove('hidden');
     }
 
     function resetWheelPos(cb) {
         canvas.style.transition = 'none'; canvas.style.transform = 'rotate(0deg)'; currentRotation = 0;
         setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; if(cb) cb(); }, 50);
-    }
-
-   function softReset() {
-        rollState = "START";
-        sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
-        resultBanner.innerText = "Fate awaits...";
-        mainBtn.innerText = "BEGIN JOURNEY";
-        
-        // HIDE THE CARD FOR THE NEW ROLL
-        snapshotCard.classList.add('hidden');
-        
-        mainBtn.classList.remove('hidden');
-        resetBtn.classList.add('hidden');
-        resetWheelPos(() => { refreshWheel(); scrollToWheel(); });
     }
 
     function refreshWheel() {
@@ -548,75 +402,51 @@
     }
 
     mainBtn.onclick = () => {
-        if(victorySound.paused) { victorySound.play().then(() => { victorySound.pause(); victorySound.currentTime = 0; }).catch(()=>{}); }
         if (rollState === "START") nextStep();
-        else if (rollState === "GENDER") { 
-            spin(getActive('genderCheckboxes'), (win) => { sessionResult.gender = win; resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`; rollState = "RACE_PENDING"; nextStep(); }); 
-        }
-        else if (rollState === "RACE") {
-            spin(getActive('raceCheckboxes'), (win) => {
-                sessionResult.race = win; 
-                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
-                const subs = raceData[win];
-                if (subs && (subs.length > 1 || subs[0] !== "Standard")) {
-                    rollState = "SUBRACE"; mainBtn.innerText = "SPIN SUB-RACE"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(subs)); scrollToWheel();
-                } else { rollState = "CLASS_PENDING"; nextStep(); }
-            });
-        }
-        else if (rollState === "SUBRACE") { spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; resultBanner.innerHTML = `${getIconHTML(sessionResult.race)} <b>${win} ${sessionResult.race}</b>`; rollState = "CLASS_PENDING"; nextStep(); }); }
-        else if (rollState === "CLASS") {
-            spin(getActive('classCheckboxes'), (win) => {
-                sessionResult.class = win; 
-                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`;
-                rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win])); scrollToWheel();
-            });
-        }
-        else if (rollState === "SUBCLASS") { spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; resultBanner.innerHTML = `${getIconHTML(sessionResult.class)} <b>${sessionResult.class} (${win})</b>`; rollState = "BG_PENDING"; nextStep(); }); }
-        else if (rollState === "BACKGROUND") { spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); }); }
+        else if (rollState === "GENDER") spin(getActive('genderCheckboxes'), (win) => { sessionResult.gender = win; rollState = "RACE_PENDING"; nextStep(); });
+        else if (rollState === "RACE") spin(getActive('raceCheckboxes'), (win) => { 
+            sessionResult.race = win; 
+            const subs = raceData[win];
+            if (subs && (subs.length > 1 || subs[0] !== "Standard")) { rollState = "SUBRACE"; mainBtn.innerText = "SPIN SUB-RACE"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(subs)); }
+            else { rollState = "CLASS_PENDING"; nextStep(); }
+        });
+        else if (rollState === "SUBRACE") spin(raceData[sessionResult.race], (win) => { sessionResult.subrace = win; rollState = "CLASS_PENDING"; nextStep(); });
+        else if (rollState === "CLASS") spin(getActive('classCheckboxes'), (win) => { 
+            sessionResult.class = win; 
+            rollState = "SUBCLASS"; mainBtn.innerText = "SPIN SUB-CLASS"; mainBtn.disabled = false; resetWheelPos(() => drawWheel(classData[win]));
+        });
+        else if (rollState === "SUBCLASS") spin(classData[sessionResult.class], (win) => { sessionResult.subclass = win; rollState = "BG_PENDING"; nextStep(); });
+        else if (rollState === "BACKGROUND") spin(getActive('bgCheckboxes'), (win) => { sessionResult.background = win; finalize(); });
     };
 
-    resetBtn.onclick = softReset;
-    
-    // This makes the Copy button actually work
+    resetBtn.onclick = () => {
+        rollState = "START"; sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
+        resultBanner.innerText = "Fate awaits..."; mainBtn.innerText = "BEGIN JOURNEY";
+        snapshotCard.classList.add('hidden'); mainBtn.classList.remove('hidden'); resetBtn.classList.add('hidden');
+        resetWheelPos(() => { refreshWheel(); });
+    };
+
     copyBtn.onclick = () => {
-        if (sessionResultString) {
-            navigator.clipboard.writeText(sessionResultString).then(() => {
-                copyBtn.innerHTML = 'COPIED! <i class="fa-solid fa-check"></i>';
-                setTimeout(() => {
-                    copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>';
-                }, 2000);
-            });
-        }
+        navigator.clipboard.writeText(sessionResultString).then(() => {
+            copyBtn.innerHTML = 'COPIED! <i class="fa-solid fa-check"></i>';
+            setTimeout(() => copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>', 2000);
+        });
     };
 
     function injectModPack(type) {
-        if (type === 'races') { 
-            ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; }); 
-            populate(raceData, 'raceCheckboxes'); 
-        } else { 
-            Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] }); 
-            populate(classData, 'classCheckboxes'); 
-        }
-        saveAllToStorage();
-        refreshWheel();
+        if (type === 'races') ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; });
+        else Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] });
+        populate(type === 'races' ? raceData : classData, type === 'races' ? 'raceCheckboxes' : 'classCheckboxes');
+        saveAllToStorage(); refreshWheel();
     }
-    
+
     function addCustomOption(containerId, inputId, dataSource) {
         const input = document.getElementById(inputId); const val = input.value.trim(); if (!val) return;
         if (Array.isArray(dataSource)) { if (!dataSource.includes(val)) dataSource.push(val); } else { if (!dataSource[val]) dataSource[val] = ["Standard"]; }
-        populate(dataSource, containerId); input.value = ""; 
-        saveAllToStorage();
-        refreshWheel();
+        populate(dataSource, containerId); input.value = ""; saveAllToStorage(); refreshWheel();
     }
 
-    window.onload = () => { 
-        populate(genderData, 'genderCheckboxes'); 
-        populate(raceData, 'raceCheckboxes'); 
-        populate(classData, 'classCheckboxes'); 
-        populate(backgrounds, 'bgCheckboxes'); 
-        renderHistory();
-        refreshWheel(); 
-    };
+    window.onload = () => { populate(genderData, 'genderCheckboxes'); populate(raceData, 'raceCheckboxes'); populate(classData, 'classCheckboxes'); populate(backgrounds, 'bgCheckboxes'); renderHistory(); refreshWheel(); };
 </script>
 </body>
 </html>
