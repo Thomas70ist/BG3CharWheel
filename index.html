@@ -232,7 +232,17 @@
 
     // Function to scroll to the wheel smoothly
     function scrollToWheel() {
-        document.getElementById('wheelSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const section = document.getElementById('wheelSection');
+        const offset = 100; // Small nudge down to keep the button in view
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = section.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - (window.innerHeight / 2) + (section.offsetHeight / 2) + offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
     }
 
     function getIconHTML(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
