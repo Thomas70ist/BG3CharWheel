@@ -175,6 +175,17 @@
 }
 
 .copy-btn i { margin-left: 8px; }
+
+        .fate-seal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #d1b17d;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    border: 2px inset #5a4b3f;
+}
         
     </style>
 </head>
@@ -458,6 +469,7 @@
         const raceFinal = r.subrace ? `${r.subrace} ${r.race}` : r.race;
         const total = `${r.gender} ${raceFinal} | ${r.class} (${r.subclass}) | ${r.background}`;
         
+        sessionResultString = total; 
         victorySound.play().catch(() => {});
 
         resultBanner.innerHTML = `
@@ -470,6 +482,16 @@
             <div class="result-text">${total}</div>
         `;
 
+        // POPULATE THE SNAPSHOT CARD SEALS WITH ICONS
+        document.getElementById('gender-seal').innerHTML = getIconHTML(r.gender);
+        document.getElementById('race-seal').innerHTML = getIconHTML(r.race);
+        document.getElementById('class-seal').innerHTML = getIconHTML(r.class);
+        document.getElementById('background-seal').innerHTML = getIconHTML(r.background);
+
+        // REVEAL THE CARD
+        snapshotCard.classList.remove('hidden');
+        copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>';
+
         rollingHistory.unshift(total);
         saveAllToStorage();
         renderHistory();
@@ -478,10 +500,8 @@
         resetBtn.classList.remove('hidden');
         mainBtn.disabled = false;
         scrollToWheel();
-
-        function finalize() {
-    // ... (your existing result banner and history list logic)
-
+    }
+    
     // Prepare Snapshot Card data
     sessionResultString = total; // Save string for copy function
 
@@ -506,11 +526,15 @@
         setTimeout(() => { canvas.style.transition = 'transform 5s cubic-bezier(0.1, 0, 0.1, 1)'; if(cb) cb(); }, 50);
     }
 
-    function softReset() {
+   function softReset() {
         rollState = "START";
         sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
         resultBanner.innerText = "Fate awaits...";
         mainBtn.innerText = "BEGIN JOURNEY";
+        
+        // HIDE THE CARD FOR THE NEW ROLL
+        snapshotCard.classList.add('hidden');
+        
         mainBtn.classList.remove('hidden');
         resetBtn.classList.add('hidden');
         resetWheelPos(() => { refreshWheel(); scrollToWheel(); });
