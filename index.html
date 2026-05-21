@@ -97,6 +97,85 @@
 
         .clear-btn { background: none; border: 1px solid #da1f3d; color: #da1f3d; font-size: 0.7rem; padding: 4px 8px; cursor: pointer; font-family: var(--font-header); border-radius: 3px; }
         .clear-btn:hover { background: #da1f3d; color: white; }
+
+        /* Character Snapshot Card Styling */
+.snapshot-card {
+    background: url('https://i.imgur.com/k8X60nU.png') center/cover; /* Aged parchment texture */
+    border: 2px solid #5a4b3f; /* Dark leather-like border */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    margin: 30px auto;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    color: #f5f5f7;
+    position: relative;
+}
+
+.card-header h3 {
+    font-family: var(--font-header);
+    color: #d1b17d; /* Gold-embossed look */
+    letter-spacing: 3px;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.header-divider {
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background-color: #5a4b3f;
+    margin: 0 10px;
+}
+
+.card-header h4 {
+    font-family: var(--font-body);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0;
+}
+
+.card-seals {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.fate-seal {
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+}
+
+.copy-box {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.copy-btn {
+    background: none;
+    border: 1px solid #d1b17d;
+    color: #d1b17d;
+    font-family: var(--font-header);
+    font-size: 0.7rem;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.copy-btn:hover {
+    background-color: #d1b17d;
+    color: #0f0f12;
+}
+
+.copy-btn i { margin-left: 8px; }
+        
     </style>
 </head>
 <body>
@@ -162,6 +241,24 @@
     </div>
 
     <div id="result-banner">Fate awaits...</div>
+
+    <div id="snapshot-card" class="snapshot-card hidden">
+      <div class="card-header">
+        <h3>BDG 3 <span class="header-divider"></span> EPIC ADVENTURE ROLL</h3>
+        <h4>Fate’s Decree</h4>
+      </div>
+      <div class="card-seals">
+        <div id="gender-seal" class="fate-seal"></div>
+        <div id="race-seal" class="fate-seal"></div>
+        <div id="class-seal" class="fate-seal"></div>
+        <div id="background-seal" class="fate-seal"></div>
+      </div>
+      <div class="copy-box">
+        <button class="copy-btn" id="copyBtn">
+            COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>
+        </button>
+      </div>
+    </div>
     
     <button class="btn" id="mainBtn">BEGIN JOURNEY</button>
     <button class="btn hidden" style="background:#222; border:1px solid #444; color:var(--gold);" id="resetBtn">NEW CHARACTER</button>
@@ -217,7 +314,7 @@
     };
     const defaultBGs = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Noble", "Outlander", "Sage", "Soldier", "Urchin"];
     const genderData = ["Male", "Female", "Trans-Male", "Trans-Female", "Non-Binary"];
-
+    
     // State Variables
     let raceData = JSON.parse(localStorage.getItem('bg3_races')) || JSON.parse(JSON.stringify(defaultRaces));
     let classData = JSON.parse(localStorage.getItem('bg3_classes')) || JSON.parse(JSON.stringify(defaultClasses));
@@ -232,7 +329,10 @@
     const historyList = document.getElementById('history-list');
     const victorySound = document.getElementById('victory-sound');
     victorySound.volume = 0.4;
-
+    const snapshotCard = document.getElementById('snapshot-card');
+    const copyBtn = document.getElementById('copyBtn');
+    let sessionResultString = ""; // This stores the text for the copy button
+    
     let currentRotation = 0;
     let rollState = "START"; 
     let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
@@ -377,7 +477,28 @@
         mainBtn.classList.add('hidden');
         resetBtn.classList.remove('hidden');
         mainBtn.disabled = false;
-        scrollToWheel(); 
+        scrollToWheel();
+
+        function finalize() {
+    // ... (your existing result banner and history list logic)
+
+    // Prepare Snapshot Card data
+    sessionResultString = total; // Save string for copy function
+
+    // Populate the card's icons (this would need image files or similar)
+    document.getElementById('gender-seal').style.backgroundImage = `url('path_to_gender_icon.png')`; // Replace with actual paths
+    document.getElementById('race-seal').style.backgroundImage = `url('path_to_race_icon.png')`; // Replace with actual paths
+    document.getElementById('class-seal').style.backgroundImage = `url('path_to_class_icon.png')`; // Replace with actual paths
+    document.getElementById('background-seal').style.backgroundImage = `url('path_to_background_icon.png')`; // Replace with actual paths
+
+    snapshotCard.classList.remove('hidden'); // Reveal the card
+    copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>'; // Reset button text
+
+    mainBtn.classList.add('hidden');
+    resetBtn.classList.remove('hidden');
+    mainBtn.disabled = false;
+    scrollToWheel();
+}
     }
 
     function resetWheelPos(cb) {
@@ -431,6 +552,18 @@
     };
 
     resetBtn.onclick = softReset;
+    
+    // This makes the Copy button actually work
+    copyBtn.onclick = () => {
+        if (sessionResultString) {
+            navigator.clipboard.writeText(sessionResultString).then(() => {
+                copyBtn.innerHTML = 'COPIED! <i class="fa-solid fa-check"></i>';
+                setTimeout(() => {
+                    copyBtn.innerHTML = 'COPY TO CLIPBOARD <i class="fa-regular fa-clipboard"></i>';
+                }, 2000);
+            });
+        }
+    };
 
     function injectModPack(type) {
         if (type === 'races') { 
