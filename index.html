@@ -24,7 +24,7 @@
             background-color: var(--bg-color); color: var(--text-color);
             margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
             font-size: 1.3rem;
-            scroll-behavior: smooth; /* Ensures smooth movement */
+            scroll-behavior: smooth;
         }
 
         .container { max-width: 900px; width: 100%; text-align: center; position: relative; }
@@ -70,7 +70,7 @@
         canvas { width: 100%; height: 100%; border-radius: 50%; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1); }
 
         .card { background-color: var(--card-color); border: 1px solid #3e3e42; border-radius: 4px; padding: 25px; margin-bottom: 20px; text-align: left; }
-        .card h3 { font-family: var(--font-header); margin-top: 0; font-size: 1.1rem; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 18px; }
+        .card h3 { font-family: var(--font-header); margin-top: 0; font-size: 1.1rem; color: var(--gold); border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
         .card.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
 
         .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
@@ -90,10 +90,13 @@
         .add-custom input { flex-grow: 1; background: #0a0a0c; border: 1px solid #444; color: white; padding: 12px; font-family: var(--font-body); font-size: 1.1rem; }
         .add-custom button { background: var(--gold); border: none; color: black; font-weight: bold; padding: 0 30px; cursor: pointer; font-family: var(--font-header); }
         
-        #history-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; text-align: left; }
-        #history-list li { padding: 15px; border-bottom: 1px solid #333; color: #ccc; font-size: 1.1rem; }
-        #history-list li span { color: var(--gold); font-family: var(--font-header); font-size: 0.9rem; }
+        #history-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; text-align: left; }
+        #history-list li { padding: 15px; border-bottom: 1px solid #333; color: #ccc; font-size: 1.1rem; display: flex; flex-direction: column; }
+        #history-list li span { color: var(--gold); font-family: var(--font-header); font-size: 0.9rem; margin-bottom: 5px; }
         .hidden { display: none !important; }
+
+        .clear-btn { background: none; border: 1px solid #da1f3d; color: #da1f3d; font-size: 0.7rem; padding: 4px 8px; cursor: pointer; font-family: var(--font-header); border-radius: 3px; }
+        .clear-btn:hover { background: #da1f3d; color: white; }
     </style>
 </head>
 <body>
@@ -101,7 +104,7 @@
 <div class="container">
     <audio id="victory-sound" src="https://www.myinstants.com/media/sounds/level-up-rpg.mp3" preload="auto"></audio>
 
-    <button class="global-reset" onclick="location.reload()" title="Full Reset Page">⟳</button>
+    <button class="global-reset" onclick="clearAllStorage()" title="Full Reset Page & Storage">⟳</button>
     
     <h1>ADVENTURE ROLLER</h1>
     <div class="subtitle">Fate of the Modded Realms</div>
@@ -164,12 +167,13 @@
     <button class="btn hidden" style="background:#222; border:1px solid #444; color:var(--gold);" id="resetBtn">NEW CHARACTER</button>
 
     <div class="card" style="margin-top: 30px;">
-        <h3>Chronicles of Fate</h3>
+        <h3>Chronicles of Fate <button class="clear-btn" onclick="clearHistory()">CLEAR HISTORY</button></h3>
         <ul id="history-list"><li id="history-placeholder" style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li></ul>
     </div>
 </div>
 
 <script>
+    // Constants & Mapping
     const iconMap = {
         "Male": "fa-solid fa-mars", "Female": "fa-solid fa-venus", "Trans-Male": "fa-solid fa-mars-double", 
         "Trans-Female": "fa-solid fa-venus-double", "Non-Binary": "fa-solid fa-genderless",
@@ -195,7 +199,7 @@
         "Artificer": "#b15f32", "Blood Hunter": "#731212"
     };
 
-    const genderData = ["Male", "Female", "Trans-Male", "Trans-Female", "Non-Binary"];
+    // Defaults
     const defaultRaces = {
         "Elf": ["High Elf", "Wood Elf"], "Tiefling": ["Asmodeus", "Mephistopheles", "Zariel"],
         "Drow": ["Lolth-Sworn", "Seldarine"], "Human": ["Standard"], "Githyanki": ["Standard"],
@@ -212,10 +216,13 @@
         "Warlock": ["Fiend", "Great Old One", "Archfey", "Hexblade"], "Wizard": ["Abjuration", "Evocation", "Necromancy", "Conjuration", "Divination", "Enchantment", "Illusion", "Transmutation", "Bladesinging"]
     };
     const defaultBGs = ["Acolyte", "Charlatan", "Criminal", "Entertainer", "Folk Hero", "Guild Artisan", "Noble", "Outlander", "Sage", "Soldier", "Urchin"];
+    const genderData = ["Male", "Female", "Trans-Male", "Trans-Female", "Non-Binary"];
 
-    let raceData = JSON.parse(JSON.stringify(defaultRaces));
-    let classData = JSON.parse(JSON.stringify(defaultClasses));
-    let backgrounds = [...defaultBGs];
+    // State Variables
+    let raceData = JSON.parse(localStorage.getItem('bg3_races')) || JSON.parse(JSON.stringify(defaultRaces));
+    let classData = JSON.parse(localStorage.getItem('bg3_classes')) || JSON.parse(JSON.stringify(defaultClasses));
+    let backgrounds = JSON.parse(localStorage.getItem('bg3_bgs')) || [...defaultBGs];
+    let rollingHistory = JSON.parse(localStorage.getItem('bg3_history')) || [];
 
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
@@ -230,21 +237,39 @@
     let rollState = "START"; 
     let sessionResult = { gender: "", race: "", subrace: "", class: "", subclass: "", background: "" };
 
-    // Function to scroll to the wheel smoothly
+    // STORAGE LOGIC
+    function saveAllToStorage() {
+        localStorage.setItem('bg3_races', JSON.stringify(raceData));
+        localStorage.setItem('bg3_classes', JSON.stringify(classData));
+        localStorage.setItem('bg3_bgs', JSON.stringify(backgrounds));
+        localStorage.setItem('bg3_history', JSON.stringify(rollingHistory));
+    }
+
+    function clearAllStorage() {
+        if(confirm("This will delete all custom mod entries and your history. Are you sure?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    function clearHistory() {
+        rollingHistory = [];
+        saveAllToStorage();
+        renderHistory();
+    }
+
+    // SCROLL LOGIC
     function scrollToWheel() {
         const section = document.getElementById('wheelSection');
-        const offset = 100; // Small nudge down to keep the button in view
+        const offset = 100;
         const bodyRect = document.body.getBoundingClientRect().top;
         const elementRect = section.getBoundingClientRect().top;
         const elementPosition = elementRect - bodyRect;
         const offsetPosition = elementPosition - (window.innerHeight / 2) + (section.offsetHeight / 2) + offset;
-
-        window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
 
+    // UI RENDERING
     function getIconHTML(name) { return iconMap[name] ? `<i class="${iconMap[name]}"></i>` : `<i class="fa-solid fa-sparkles"></i>`; }
 
     function populate(data, id) {
@@ -259,6 +284,19 @@
         });
     }
 
+    function renderHistory() {
+        historyList.innerHTML = "";
+        if (rollingHistory.length === 0) {
+            historyList.innerHTML = `<li id="history-placeholder" style="color: var(--text-muted); font-style: italic;">The ink has not yet dried...</li>`;
+            return;
+        }
+        rollingHistory.forEach((entry, idx) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>ENTRY #${rollingHistory.length - idx}</span>${entry}`;
+            historyList.appendChild(li);
+        });
+    }
+
     function syncUI() {
         document.getElementById('cardGender').classList.toggle('disabled', !document.getElementById('spinGender').checked);
         document.getElementById('cardRace').classList.toggle('disabled', !document.getElementById('spinRace').checked);
@@ -269,6 +307,7 @@
 
     function getActive(id) { return Array.from(document.querySelectorAll(`#${id} input:checked`)).map(i => i.value); }
 
+    // WHEEL LOGIC
     function drawWheel(options) {
         const n = options.length;
         if (n === 0) { ctx.clearRect(0,0,500,500); return; }
@@ -286,7 +325,7 @@
     }
 
     function spin(options, onEnd) {
-        scrollToWheel(); // Ensure view is correct when spinning starts
+        scrollToWheel();
         const roll = 1800 + Math.floor(Math.random()*360);
         currentRotation += roll;
         canvas.style.transform = `rotate(${currentRotation}deg)`;
@@ -331,12 +370,9 @@
             <div class="result-text">${total}</div>
         `;
 
-        const placeholder = document.getElementById('history-placeholder');
-        if (placeholder) placeholder.remove();
-
-        const li = document.createElement('li');
-        li.innerHTML = `<span>ENTRY #${historyList.children.length + 1}</span><br>${total}`;
-        historyList.prepend(li);
+        rollingHistory.unshift(total);
+        saveAllToStorage();
+        renderHistory();
 
         mainBtn.classList.add('hidden');
         resetBtn.classList.remove('hidden');
@@ -356,10 +392,7 @@
         mainBtn.innerText = "BEGIN JOURNEY";
         mainBtn.classList.remove('hidden');
         resetBtn.classList.add('hidden');
-        resetWheelPos(() => {
-            refreshWheel();
-            scrollToWheel();
-        });
+        resetWheelPos(() => { refreshWheel(); scrollToWheel(); });
     }
 
     function refreshWheel() {
@@ -371,14 +404,9 @@
 
     mainBtn.onclick = () => {
         if(victorySound.paused) { victorySound.play().then(() => { victorySound.pause(); victorySound.currentTime = 0; }).catch(()=>{}); }
-
         if (rollState === "START") nextStep();
         else if (rollState === "GENDER") { 
-            spin(getActive('genderCheckboxes'), (win) => { 
-                sessionResult.gender = win; 
-                resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`; 
-                rollState = "RACE_PENDING"; nextStep(); 
-            }); 
+            spin(getActive('genderCheckboxes'), (win) => { sessionResult.gender = win; resultBanner.innerHTML = `${getIconHTML(win)} <b>${win}</b>`; rollState = "RACE_PENDING"; nextStep(); }); 
         }
         else if (rollState === "RACE") {
             spin(getActive('raceCheckboxes'), (win) => {
@@ -405,18 +433,33 @@
     resetBtn.onclick = softReset;
 
     function injectModPack(type) {
-        if (type === 'races') { ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; }); populate(raceData, 'raceCheckboxes'); }
-        else { Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] }); populate(classData, 'classCheckboxes'); }
+        if (type === 'races') { 
+            ["Aasimar", "Demon", "Fairy", "Firbolg", "Tabaxi", "Goliath", "Warforged", "Satyr"].forEach(m => { if(!raceData[m]) raceData[m] = ["Standard"]; }); 
+            populate(raceData, 'raceCheckboxes'); 
+        } else { 
+            Object.assign(classData, { "Artificer": ["Alchemist", "Armorer", "Artillerist", "Battlesmith"], "Blood Hunter": ["Ghostslayer", "Lycan", "Mutant", "Profane Soul"] }); 
+            populate(classData, 'classCheckboxes'); 
+        }
+        saveAllToStorage();
         refreshWheel();
     }
     
     function addCustomOption(containerId, inputId, dataSource) {
         const input = document.getElementById(inputId); const val = input.value.trim(); if (!val) return;
         if (Array.isArray(dataSource)) { if (!dataSource.includes(val)) dataSource.push(val); } else { if (!dataSource[val]) dataSource[val] = ["Standard"]; }
-        populate(dataSource, containerId); input.value = ""; refreshWheel();
+        populate(dataSource, containerId); input.value = ""; 
+        saveAllToStorage();
+        refreshWheel();
     }
 
-    window.onload = () => { populate(genderData, 'genderCheckboxes'); populate(raceData, 'raceCheckboxes'); populate(classData, 'classCheckboxes'); populate(backgrounds, 'bgCheckboxes'); refreshWheel(); };
+    window.onload = () => { 
+        populate(genderData, 'genderCheckboxes'); 
+        populate(raceData, 'raceCheckboxes'); 
+        populate(classData, 'classCheckboxes'); 
+        populate(backgrounds, 'bgCheckboxes'); 
+        renderHistory();
+        refreshWheel(); 
+    };
 </script>
 </body>
 </html>
